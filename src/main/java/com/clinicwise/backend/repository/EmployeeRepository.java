@@ -1,7 +1,7 @@
 package com.clinicwise.backend.repository;
 
 import com.clinicwise.backend.entity.Employee;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface EmployeeRepository extends Repository<Employee, Integer> {
+public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 }
