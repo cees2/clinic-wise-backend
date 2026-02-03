@@ -1,6 +1,7 @@
 package com.clinicwise.backend.error;
 
 import com.clinicwise.backend.exceptions.EmployeeWithProvidedDataExists;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,5 +14,12 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(ErrorCode.VALIDATION_ERROR, exception.getMessage());
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ApiError> entityNotFoundExceptionHandler(EntityNotFoundException exception){
+        ApiError error = new ApiError(ErrorCode.ENTITY_NOT_FOUND, exception.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 }

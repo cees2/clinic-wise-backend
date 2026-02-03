@@ -1,6 +1,7 @@
 package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
+import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.exceptions.EmployeeWithProvidedDataExists;
@@ -8,11 +9,13 @@ import com.clinicwise.backend.mapper.EmployeeMapper;
 import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.specification.EmployeeSpecifications;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EmployeeService {
@@ -51,5 +54,23 @@ public class EmployeeService {
         employeeRepository.save(employee);
 
         return EmployeeMapper.toResponse(employee);
+    }
+
+    @Transactional
+    public EmployeeResponse updateEmployee(int employeeId, UpdateEmployeeRequest updateEmployeeRequest) {
+        Employee employeeToBeUpdated = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find an employee with given ID"));
+
+        EmployeeMapper.updateEmployeeFromRequest(updateEmployeeRequest, employeeToBeUpdated);
+
+        return EmployeeMapper.toResponse(employeeToBeUpdated);
+    }
+
+    @Transactional
+    public void deleteEmployee(@PathVariable int employeeId) {
+        Employee employeeToBeDeleted = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find an employee with given ID"));
+
+        employeeRepository.delete(employeeToBeDeleted);
     }
 }

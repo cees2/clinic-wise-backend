@@ -3,7 +3,8 @@ package com.clinicwise.backend.error;
 import java.util.List;
 
 enum ErrorCode{
-    VALIDATION_ERROR
+    VALIDATION_ERROR,
+    ENTITY_NOT_FOUND
 }
 
 public record ApiError(ErrorCode code, String message, List<ValidationError> validationErrors) {
