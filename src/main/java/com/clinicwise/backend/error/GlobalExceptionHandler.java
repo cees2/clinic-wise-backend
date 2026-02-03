@@ -1,0 +1,17 @@
+package com.clinicwise.backend.error;
+
+import com.clinicwise.backend.exceptions.EmployeeWithProvidedDataExists;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(EmployeeWithProvidedDataExists.class)
+    public ResponseEntity<ApiError> employeeWithDocumentIDExistsHandler (EmployeeWithProvidedDataExists exception) {
+        ApiError error = new ApiError(ErrorCode.VALIDATION_ERROR, exception.getMessage());
+
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+}
