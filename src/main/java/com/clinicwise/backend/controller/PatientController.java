@@ -1,11 +1,12 @@
 package com.clinicwise.backend.controller;
 
+import com.clinicwise.backend.dto.request.CreatePatientRequest;
+import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
-import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.service.PatientService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,7 +20,29 @@ public class PatientController {
     }
 
     @GetMapping
-    List<PatientResponse> getAllPatients(){
+    List<PatientResponse> getAllPatients() {
         return patientService.getAllPatients();
+    }
+
+    @GetMapping("/{patientId}")
+    PatientResponse getPatient(int patientId) {
+        return patientService.getPatient(patientId);
+    }
+
+    @PatchMapping("/{patientId}")
+    PatientResponse updatePatient(int patientId, @RequestBody UpdatePatientRequest updatePatientRequest) {
+        return patientService.updatePatient(patientId, updatePatientRequest);
+    }
+
+    @PostMapping
+    PatientResponse updatePatient(@Valid @RequestBody CreatePatientRequest createPatientRequest) {
+        return patientService.createPatient(createPatientRequest);
+    }
+
+    @DeleteMapping("/{patientId}")
+    ResponseEntity<Void> deletePatient(int patientId) {
+        patientService.deletePatient(patientId);
+
+        return ResponseEntity.noContent().build();
     }
 }
