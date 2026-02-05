@@ -25,12 +25,12 @@ public class PatientController {
     }
 
     @GetMapping("/{patientId}")
-    PatientResponse getPatient(int patientId) {
+    PatientResponse getPatient(@PathVariable int patientId) {
         return patientService.getPatient(patientId);
     }
 
     @PatchMapping("/{patientId}")
-    PatientResponse updatePatient(int patientId, @RequestBody UpdatePatientRequest updatePatientRequest) {
+    PatientResponse updatePatient(@PathVariable int patientId, @RequestBody UpdatePatientRequest updatePatientRequest) {
         return patientService.updatePatient(patientId, updatePatientRequest);
     }
 
@@ -40,7 +40,7 @@ public class PatientController {
     }
 
     @DeleteMapping("/{patientId}")
-    ResponseEntity<Void> deletePatient(int patientId) {
+    ResponseEntity<Void> deletePatient(@PathVariable int patientId) {
         patientService.deletePatient(patientId);
 
         return ResponseEntity.noContent().build();

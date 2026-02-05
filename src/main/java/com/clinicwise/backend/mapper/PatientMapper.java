@@ -7,6 +7,7 @@ import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.enums.Gender;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class PatientMapper {
     public static Patient createPatientFromRequest(CreatePatientRequest createPatientRequest){
@@ -20,6 +21,7 @@ public class PatientMapper {
         patient.setNationality(createPatientRequest.nationality());
         patient.setPhoneNumber(createPatientRequest.phoneNumber());
         patient.setStartDate(createPatientRequest.startDate());
+        patient.setCreatedAt(LocalDateTime.now());
 
         return patient;
     }
