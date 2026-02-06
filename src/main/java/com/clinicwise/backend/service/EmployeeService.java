@@ -45,7 +45,6 @@ public class EmployeeService {
         assertNoDuplicateEmployee(null, createEmployeeRequest.documentID(), createEmployeeRequest.email(), createEmployeeRequest.phoneNumber());
 
         Employee employee = employeeMapper.createEmployeeFromRequest(createEmployeeRequest);
-
         employeeRepository.save(employee);
 
         return EmployeeMapper.toResponse(employee);
@@ -57,7 +56,6 @@ public class EmployeeService {
                 .orElseThrow(() -> new EntityNotFoundException("Could not find an employee with given ID"));
 
         assertNoDuplicateEmployee(employeeId, updateEmployeeRequest.documentID(), updateEmployeeRequest.email(), updateEmployeeRequest.phoneNumber());
-
         EmployeeMapper.updateEmployeeFromRequest(updateEmployeeRequest, employeeToBeUpdated);
 
         return EmployeeMapper.toResponse(employeeToBeUpdated);

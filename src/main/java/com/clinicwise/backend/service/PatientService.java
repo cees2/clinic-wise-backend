@@ -51,7 +51,6 @@ public class PatientService {
         Patient patient = PatientMapper.createPatientFromRequest(createPatientRequest);
 
         assertNoDuplicatePatient(null, createPatientRequest.documentId(), createPatientRequest.phoneNumber());
-
         patientRepository.save(patient);
 
         return PatientMapper.toResponse(patient);
