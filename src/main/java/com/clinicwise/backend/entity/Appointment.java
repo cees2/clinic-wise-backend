@@ -3,7 +3,6 @@ package com.clinicwise.backend.entity;
 import com.clinicwise.backend.enums.AppointmentStatus;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
