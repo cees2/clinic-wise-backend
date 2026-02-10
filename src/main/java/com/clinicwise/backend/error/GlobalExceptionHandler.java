@@ -24,7 +24,6 @@ public class GlobalExceptionHandler {
 
         if(error instanceof SQLException SQLException){
             int errorCode = SQLException.getErrorCode();
-            String SQLState = SQLException.getSQLState();
 
             if(errorCode == 1062){
                 message = "Resource already exists";
@@ -88,5 +87,12 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(ErrorCode.VALIDATION_ERROR, exception.getMessage());
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiError> runtimeExceptionHandler(RuntimeException exception){
+        ApiError error = new ApiError(ErrorCode.INTERNAL_ERROR, "Internal server error");
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
