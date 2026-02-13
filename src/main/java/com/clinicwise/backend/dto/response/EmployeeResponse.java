@@ -16,6 +16,7 @@ public record EmployeeResponse(
         String address,
         String phoneNumber,
         String email,
-        EmployeeRole role
+        EmployeeRole role,
+        String documentId
 ) {
 }

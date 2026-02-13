@@ -17,7 +17,6 @@ public class EmployeeMapper {
     public Employee createEmployeeFromRequest(CreateEmployeeRequest createEmployeeRequest) {
         Employee employee = new Employee();
         employee.setCreatedAt(LocalDateTime.now());
-        employee.setDateOfBirth(LocalDate.now());
         employee.setStartDate(createEmployeeRequest.startDate());
         employee.setName(createEmployeeRequest.name());
         employee.setSurname(createEmployeeRequest.surname());
@@ -73,7 +72,8 @@ public class EmployeeMapper {
                 employee.getAddress(),
                 employee.getPhoneNumber(),
                 employee.getEmail(),
-                employee.getRole()
+                employee.getRole(),
+                employee.getDocumentID()
         );
     }
 }
