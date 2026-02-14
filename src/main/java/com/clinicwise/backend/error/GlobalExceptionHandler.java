@@ -1,7 +1,6 @@
 package com.clinicwise.backend.error;
 
-import com.clinicwise.backend.exceptions.EmployeeWithProvidedDataExists;
-import com.clinicwise.backend.exceptions.PatientWithProvidedDataExists;
+import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
 import com.clinicwise.backend.exceptions.RoomOccupancyOverlapping;
 import com.clinicwise.backend.exceptions.RoomWithNameExists;
 import jakarta.persistence.EntityNotFoundException;
@@ -54,8 +53,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
     }
 
-    @ExceptionHandler(EmployeeWithProvidedDataExists.class)
-    public ResponseEntity<ApiError> employeeWithDocumentIDExistsHandler(EmployeeWithProvidedDataExists exception) {
+    @ExceptionHandler(UserWithProvidedDataExists.class)
+    public ResponseEntity<ApiError> employeeWithDocumentIDExistsHandler(UserWithProvidedDataExists exception) {
         ApiError error = new ApiError(ErrorCode.VALIDATION_ERROR, exception.getMessage());
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
@@ -68,15 +67,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    @ExceptionHandler(PatientWithProvidedDataExists.class)
-    public ResponseEntity<ApiError> patientWithDataExistsHandler(PatientWithProvidedDataExists exception) {
-        ApiError error = new ApiError(ErrorCode.VALIDATION_ERROR, exception.getMessage());
-
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
-    }
-
     @ExceptionHandler(RoomWithNameExists.class)
-    public ResponseEntity<ApiError> patientWithDataExistsHandler(RoomWithNameExists exception) {
+    public ResponseEntity<ApiError> roomWithNameExistsHandler(RoomWithNameExists exception) {
         ApiError error = new ApiError(ErrorCode.VALIDATION_ERROR, exception.getMessage());
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
@@ -91,7 +83,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiError> runtimeExceptionHandler(RuntimeException exception){
-        ApiError error = new ApiError(ErrorCode.INTERNAL_ERROR, "Internal server error");
+        ApiError error = new ApiError(ErrorCode.INTERNAL_ERROR, exception.getMessage());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }

@@ -9,7 +9,10 @@ import java.time.LocalDate;
 @Table(name = "users")
 public class User {
     @Id
-    @Column(name = "username")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, unique = true)
+    private Integer id;
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
     @Column(name = "password", nullable = false)
     private String password;

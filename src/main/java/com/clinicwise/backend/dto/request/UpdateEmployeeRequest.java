@@ -2,12 +2,13 @@ package com.clinicwise.backend.dto.request;
 
 import com.clinicwise.backend.enums.EmployeeRole;
 import com.clinicwise.backend.enums.Gender;
+
 import java.time.LocalDate;
 
 public record UpdateEmployeeRequest(
         LocalDate startDate,
-        String name,
-        String surname,
+        String firstname,
+        String lastname,
         Gender gender,
         LocalDate dateOfBirth,
         String nationality,
@@ -15,6 +16,9 @@ public record UpdateEmployeeRequest(
         String phoneNumber,
         String email,
         EmployeeRole role,
-        String documentID
+        String documentId,
+        String username,
+        String password,
+        Boolean enabled
 ) {
 }

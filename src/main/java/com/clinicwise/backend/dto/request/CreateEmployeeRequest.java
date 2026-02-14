@@ -11,9 +11,9 @@ public record CreateEmployeeRequest(
         @NotNull
         LocalDate startDate,
         @NotBlank
-        String name,
+        String firstname,
         @NotBlank
-        String surname,
+        String lastname,
         @NotNull
         Gender gender,
         @NotNull
@@ -29,6 +29,12 @@ public record CreateEmployeeRequest(
         @NotNull
         EmployeeRole role,
         @NotBlank
-        String documentID
+        String documentId,
+        @NotBlank
+        String username,
+        @NotBlank
+        String password,
+        @NotNull
+        Boolean enabled
 ) {
 }

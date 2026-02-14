@@ -21,7 +21,7 @@ public class Employee {
     @Column(name = "role", nullable = false)
     private EmployeeRole role;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "username", referencedColumnName = "username", nullable = false, unique = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;
 
     public Integer getId() {
@@ -56,11 +56,7 @@ public class Employee {
         this.role = role;
     }
 
-    public User getUser() {
-        return user;
-    }
+    public User getUser() {return user;}
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+    public void setUser(User user) {this.user = user;}
 }

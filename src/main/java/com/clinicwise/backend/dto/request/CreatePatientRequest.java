@@ -1,6 +1,7 @@
 package com.clinicwise.backend.dto.request;
 
 import com.clinicwise.backend.enums.Gender;
+import com.clinicwise.backend.enums.PatientSubscriptionPlan;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -8,9 +9,9 @@ import java.time.LocalDate;
 
 public record CreatePatientRequest(
         @NotBlank
-        String name,
+        String firstname,
         @NotBlank
-        String surname,
+        String lastname,
         @NotNull
         Gender gender,
         @NotNull
@@ -24,6 +25,17 @@ public record CreatePatientRequest(
         @NotBlank
         String phoneNumber,
         @NotNull
-        LocalDate startDate
+        LocalDate startDate,
+        @NotBlank
+        String email,
+        @NotNull
+        PatientSubscriptionPlan
+        patientSubscriptionPlan,
+        @NotNull
+        Boolean enabled,
+        @NotBlank
+        String username,
+        @NotBlank
+        String password
 ) {
 }

@@ -1,6 +1,5 @@
 package com.clinicwise.backend.entity;
 
-import com.clinicwise.backend.enums.Gender;
 import com.clinicwise.backend.enums.PatientSubscriptionPlan;
 import jakarta.persistence.*;
 
@@ -22,7 +21,7 @@ public class Patient {
     @Column(name = "subscription_plan", nullable = false)
     private PatientSubscriptionPlan subscriptionPlan;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "username", referencedColumnName = "username", nullable = false, unique = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;
 
 

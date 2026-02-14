@@ -4,10 +4,12 @@ import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
 import com.clinicwise.backend.entity.Patient;
-import com.clinicwise.backend.exceptions.PatientWithProvidedDataExists;
+import com.clinicwise.backend.entity.User;
+import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
 import com.clinicwise.backend.mapper.PatientMapper;
 import com.clinicwise.backend.repository.PatientRepository;
-import com.clinicwise.backend.specification.PatientSpecifications;
+import com.clinicwise.backend.repository.UserRepository;
+import com.clinicwise.backend.specification.UserSpecifications;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +19,11 @@ import java.util.List;
 @Service
 public class PatientService {
     private PatientRepository patientRepository;
+    private UserRepository userRepository;
 
-    public PatientService(PatientRepository patientRepository) {
+    public PatientService(PatientRepository patientRepository, UserRepository userRepository) {
         this.patientRepository = patientRepository;
+        this.userRepository = userRepository;
     }
 
     public List<PatientResponse> getAllPatients() {
@@ -37,10 +41,16 @@ public class PatientService {
 
     @Transactional
     public PatientResponse updatePatient(int patientId, UpdatePatientRequest updatePatientRequest) {
+        assertNoDuplicatePatient(
+                patientId,
+                updatePatientRequest.documentId(),
+                updatePatientRequest.email(),
+                updatePatientRequest.phoneNumber(),
+                updatePatientRequest.username()
+        );
         Patient patientToBeUpdated = patientRepository.findById(patientId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a patient with ID: " + patientId));
 
-        assertNoDuplicatePatient(patientId, updatePatientRequest.documentId(), updatePatientRequest.phoneNumber());
         PatientMapper.updatePatientFromRequest(updatePatientRequest, patientToBeUpdated);
 
         return PatientMapper.toResponse(patientToBeUpdated);
@@ -48,9 +58,17 @@ public class PatientService {
 
     @Transactional
     public PatientResponse createPatient(CreatePatientRequest createPatientRequest) {
+        assertNoDuplicatePatient(
+                null,
+                createPatientRequest.documentId(),
+                createPatientRequest.email(),
+                createPatientRequest.phoneNumber(),
+                createPatientRequest.username()
+        );
+
         Patient patient = PatientMapper.createPatientFromRequest(createPatientRequest);
 
-        assertNoDuplicatePatient(null, createPatientRequest.documentId(), createPatientRequest.phoneNumber());
+        userRepository.save(patient.getUser());
         patientRepository.save(patient);
 
         return PatientMapper.toResponse(patient);
@@ -64,18 +82,15 @@ public class PatientService {
         patientRepository.delete(patientToBeUpdated);
     }
 
-    private void assertNoDuplicatePatient(Integer patientId, String documentId, String phoneNumber) {
-        List<Patient> patientsWithSimilarData = patientRepository
+    private void assertNoDuplicatePatient(Integer patientId, String documentId, String email, String phoneNumber, String username) {
+        List<User> usersWithSimilarData = userRepository
                 .findAll(
-                        PatientSpecifications
-                                .hasDocumentIdOrPhoneNumber(documentId, phoneNumber)
-                )
-                .stream()
-                .filter(patient -> patientId == null || !patient.getId().equals(patientId) )
-                .toList();
+                        UserSpecifications
+                                .hasDocumentIDOrEmailOrPhoneNumberOrUserName(documentId, email, phoneNumber,username)
+                );
 
-        if (!patientsWithSimilarData.isEmpty()) {
-            throw new PatientWithProvidedDataExists();
+        if (!usersWithSimilarData.isEmpty()) {
+            throw new UserWithProvidedDataExists();
         }
     }
 }

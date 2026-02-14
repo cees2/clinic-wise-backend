@@ -35,7 +35,7 @@ public class PatientController {
     }
 
     @PostMapping
-    PatientResponse updatePatient(@Valid @RequestBody CreatePatientRequest createPatientRequest) {
+    PatientResponse createPatient(@Valid @RequestBody CreatePatientRequest createPatientRequest) {
         return patientService.createPatient(createPatientRequest);
     }
 

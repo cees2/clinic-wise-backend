@@ -4,10 +4,12 @@ import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
 import com.clinicwise.backend.entity.Employee;
-import com.clinicwise.backend.exceptions.EmployeeWithProvidedDataExists;
+import com.clinicwise.backend.entity.User;
+import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
 import com.clinicwise.backend.mapper.EmployeeMapper;
 import com.clinicwise.backend.repository.EmployeeRepository;
-import com.clinicwise.backend.specification.EmployeeSpecifications;
+import com.clinicwise.backend.repository.UserRepository;
+import com.clinicwise.backend.specification.UserSpecifications;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +21,12 @@ import java.util.List;
 public class EmployeeService {
     private EmployeeRepository employeeRepository;
     private EmployeeMapper employeeMapper;
+    private UserRepository userRepository;
 
-    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper) {
+    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper, UserRepository userRepository) {
         this.employeeRepository = employeeRepository;
         this.employeeMapper = employeeMapper;
+        this.userRepository = userRepository;
     }
 
     public List<EmployeeResponse> getAllEmployees() {
@@ -39,7 +43,12 @@ public class EmployeeService {
 
     @Transactional
     public EmployeeResponse createEmployee(CreateEmployeeRequest createEmployeeRequest) {
-        assertNoDuplicateEmployee(null, createEmployeeRequest.documentID(), createEmployeeRequest.email(), createEmployeeRequest.phoneNumber());
+        assertNoDuplicateUser(null,
+                createEmployeeRequest.documentId(),
+                createEmployeeRequest.email(),
+                createEmployeeRequest.phoneNumber(),
+                createEmployeeRequest.username()
+        );
 
         Employee employee = employeeMapper.createEmployeeFromRequest(createEmployeeRequest);
         employeeRepository.save(employee);
@@ -52,7 +61,13 @@ public class EmployeeService {
         Employee employeeToBeUpdated = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find an employee with given ID"));
 
-        assertNoDuplicateEmployee(employeeId, updateEmployeeRequest.documentID(), updateEmployeeRequest.email(), updateEmployeeRequest.phoneNumber());
+        assertNoDuplicateUser(
+                employeeId,
+                updateEmployeeRequest.documentId(),
+                updateEmployeeRequest.email(),
+                updateEmployeeRequest.phoneNumber(),
+                updateEmployeeRequest.username()
+        );
         EmployeeMapper.updateEmployeeFromRequest(updateEmployeeRequest, employeeToBeUpdated);
 
         return EmployeeMapper.toResponse(employeeToBeUpdated);
@@ -66,18 +81,15 @@ public class EmployeeService {
         employeeRepository.delete(employeeToBeDeleted);
     }
 
-    private void assertNoDuplicateEmployee(Integer employeeId, String documentId, String email, String phoneNumber) {
-        List<Employee> employeesWithSimilarData = employeeRepository
+    private void assertNoDuplicateUser(Integer employeeId, String documentId, String email, String phoneNumber, String username) {
+        List<User> usersWithSimilarData = userRepository
                 .findAll(
-                        EmployeeSpecifications
-                                .hasDocumentIDOrEmailOrPhoneNumber(documentId, email, phoneNumber)
-                )
-                .stream()
-                .filter(employee -> employeeId == null || !employee.getId().equals(employeeId))
-                .toList();
+                        UserSpecifications
+                                .hasDocumentIDOrEmailOrPhoneNumberOrUserName(documentId, email, phoneNumber,username)
+                );
 
-        if (!employeesWithSimilarData.isEmpty()) {
-            throw new EmployeeWithProvidedDataExists();
+        if (!usersWithSimilarData.isEmpty()) {
+            throw new UserWithProvidedDataExists();
         }
     }
 }
