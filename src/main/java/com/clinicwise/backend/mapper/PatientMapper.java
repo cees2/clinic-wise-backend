@@ -8,12 +8,15 @@ import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.enums.Gender;
 import com.clinicwise.backend.enums.PatientSubscriptionPlan;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class PatientMapper {
     public static Patient createPatientFromRequest(CreatePatientRequest createPatientRequest) {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
+
         Patient patient = new Patient();
         patient.setStartDate(createPatientRequest.startDate());
         patient.setCreatedAt(LocalDateTime.now());
@@ -31,7 +34,7 @@ public class PatientMapper {
         user.setEmail(createPatientRequest.email());
         user.setEnabled(createPatientRequest.enabled());
         user.setUsername(createPatientRequest.username());
-        user.setPassword(createPatientRequest.password());
+        user.setPassword(bCryptPasswordEncoder.encode(createPatientRequest.password()));
 
         patient.setUser(user);
 

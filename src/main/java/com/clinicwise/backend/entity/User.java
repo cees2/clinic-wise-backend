@@ -38,6 +38,10 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    public Integer getId() {return id;}
+
+    public void setId(Integer id) {this.id = id;}
+
     public String getUsername() {
         return username;
     }

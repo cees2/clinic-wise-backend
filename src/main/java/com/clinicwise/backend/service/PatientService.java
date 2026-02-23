@@ -11,6 +11,7 @@ import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.repository.UserRepository;
 import com.clinicwise.backend.specification.UserSpecifications;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
