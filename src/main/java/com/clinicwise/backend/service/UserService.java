@@ -20,10 +20,10 @@ public class UserService {
 
     public LoginResponse login(LoginRequest loginRequest){
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
 
         if(authentication.isAuthenticated()){
-            String token = JWTService.generateToken(loginRequest.username());
+            String token = JWTService.generateToken(loginRequest.email());
             return new LoginResponse(token);
         }
 
