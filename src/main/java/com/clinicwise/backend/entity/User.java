@@ -4,6 +4,7 @@ import com.clinicwise.backend.enums.Gender;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -37,6 +38,9 @@ public class User {
     private String documentId;
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "username", referencedColumnName = "username")
+    private Set<Authority> authorities;
 
     public Integer getId() {return id;}
 
