@@ -38,7 +38,7 @@ public class User {
     private String documentId;
     @Column(name = "email", nullable = false, unique = true)
     private String email;
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "username", referencedColumnName = "username")
     private Set<Authority> authorities;
 
@@ -141,4 +141,8 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public Set<Authority> getAuthorities() {return authorities;}
+
+    public void setAuthorities(Set<Authority> authorities) {this.authorities = authorities;}
 }

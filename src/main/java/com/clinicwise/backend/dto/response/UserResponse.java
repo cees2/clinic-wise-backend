@@ -3,6 +3,7 @@ package com.clinicwise.backend.dto.response;
 import com.clinicwise.backend.enums.Gender;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 public record UserResponse(
         String username,
@@ -15,6 +16,7 @@ public record UserResponse(
         String email,
         boolean enabled,
         String nationality,
-        String phoneNumber
+        String phoneNumber,
+        Set<String> authorities
 ) {
 }
