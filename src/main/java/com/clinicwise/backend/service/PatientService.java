@@ -1,5 +1,6 @@
 package com.clinicwise.backend.service;
 
+import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
@@ -11,7 +12,6 @@ import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.repository.UserRepository;
 import com.clinicwise.backend.specification.UserSpecifications;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +27,12 @@ public class PatientService {
         this.userRepository = userRepository;
     }
 
-    public List<PatientResponse> getAllPatients() {
+    public ListResponse<List<PatientResponse>> getAllPatients() {
         List<Patient> patients = patientRepository.findAll();
+        List<PatientResponse> patientsList = patients.stream().map(PatientMapper::toResponse).toList();
+        long patientsCount = patientRepository.count();
 
-        return patients.stream().map(PatientMapper::toResponse).toList();
+        return ListResponse.toResponse(patientsList, patientsCount);
     }
 
     public PatientResponse getPatient(int patientId) {
@@ -87,7 +89,7 @@ public class PatientService {
         List<User> usersWithSimilarData = userRepository
                 .findAll(
                         UserSpecifications
-                                .hasDocumentIDOrEmailOrPhoneNumberOrUserName(documentId, email, phoneNumber,username)
+                                .hasDocumentIDOrEmailOrPhoneNumberOrUserName(documentId, email, phoneNumber, username)
                 );
 
         if (!usersWithSimilarData.isEmpty()) {

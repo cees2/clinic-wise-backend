@@ -1,5 +1,6 @@
 package com.clinicwise.backend.controller;
 
+import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
@@ -20,7 +21,7 @@ public class PatientController {
     }
 
     @GetMapping
-    List<PatientResponse> getAllPatients() {
+    ListResponse<List<PatientResponse>> getAllPatients() {
         return patientService.getAllPatients();
     }
 
