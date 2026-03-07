@@ -26,8 +26,6 @@ public record CreatePatientRequest(
         String phoneNumber,
         @NotNull
         LocalDate startDate,
-        @NotBlank
-        String email,
         @NotNull
         PatientSubscriptionPlan
         patientSubscriptionPlan,

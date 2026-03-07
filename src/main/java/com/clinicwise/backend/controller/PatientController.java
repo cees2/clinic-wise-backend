@@ -21,7 +21,7 @@ public class PatientController {
     }
 
     @GetMapping
-    ListResponse<List<PatientResponse>> getAllPatients() {
+    ListResponse<PatientResponse> getAllPatients() {
         return patientService.getAllPatients();
     }
 

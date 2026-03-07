@@ -27,7 +27,7 @@ public class PatientService {
         this.userRepository = userRepository;
     }
 
-    public ListResponse<List<PatientResponse>> getAllPatients() {
+    public ListResponse<PatientResponse> getAllPatients() {
         List<Patient> patients = patientRepository.findAll();
         List<PatientResponse> patientsList = patients.stream().map(PatientMapper::toResponse).toList();
         long patientsCount = patientRepository.count();
@@ -47,7 +47,6 @@ public class PatientService {
         assertNoDuplicatePatient(
                 patientId,
                 updatePatientRequest.documentId(),
-                updatePatientRequest.email(),
                 updatePatientRequest.phoneNumber(),
                 updatePatientRequest.username()
         );
@@ -64,7 +63,6 @@ public class PatientService {
         assertNoDuplicatePatient(
                 null,
                 createPatientRequest.documentId(),
-                createPatientRequest.email(),
                 createPatientRequest.phoneNumber(),
                 createPatientRequest.username()
         );
@@ -85,11 +83,11 @@ public class PatientService {
         patientRepository.delete(patientToBeUpdated);
     }
 
-    private void assertNoDuplicatePatient(Integer patientId, String documentId, String email, String phoneNumber, String username) {
+    private void assertNoDuplicatePatient(Integer patientId, String documentId, String phoneNumber, String username) {
         List<User> usersWithSimilarData = userRepository
                 .findAll(
                         UserSpecifications
-                                .hasDocumentIDOrEmailOrPhoneNumberOrUserName(documentId, email, phoneNumber, username)
+                                .hasDocumentIDOrPhoneNumberOrUserName(documentId, phoneNumber, username)
                 );
 
         if (!usersWithSimilarData.isEmpty()) {

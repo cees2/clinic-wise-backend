@@ -1,9 +1,11 @@
 package com.clinicwise.backend.api.response;
 
-public class ListResponse<T> extends ApiResponse<T> {
+import java.util.List;
+
+public class ListResponse<T> extends ApiResponse<List<T>> {
     private long size;
 
-    public ListResponse(T data, long size){
+    public ListResponse(List<T> data, long size){
         super(data);
         this.size = size;
     }
@@ -16,7 +18,7 @@ public class ListResponse<T> extends ApiResponse<T> {
         this.size = size;
     }
 
-    public static <U> ListResponse<U> toResponse(U data, long size){
+    public static <U> ListResponse<U> toResponse(List<U> data, long size){
         return new ListResponse<>(data, size);
     }
 }

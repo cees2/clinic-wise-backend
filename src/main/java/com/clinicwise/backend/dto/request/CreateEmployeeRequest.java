@@ -24,8 +24,6 @@ public record CreateEmployeeRequest(
         String address,
         @NotBlank
         String phoneNumber,
-        @NotBlank
-        String email,
         @NotNull
         EmployeeRole role,
         @NotBlank
@@ -33,8 +31,6 @@ public record CreateEmployeeRequest(
         @NotBlank
         String username,
         @NotBlank
-        String password,
-        @NotNull
-        Boolean enabled
+        String password
 ) {
 }

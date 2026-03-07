@@ -13,7 +13,6 @@ public record UserResponse(
         String address,
         LocalDate dateOfBirth,
         String documentId,
-        String email,
         boolean enabled,
         String nationality,
         String phoneNumber,

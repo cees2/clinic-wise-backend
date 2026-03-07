@@ -31,7 +31,6 @@ public class PatientMapper {
         user.setAddress(createPatientRequest.address());
         user.setNationality(createPatientRequest.nationality());
         user.setPhoneNumber(createPatientRequest.phoneNumber());
-        user.setEmail(createPatientRequest.email());
         user.setEnabled(createPatientRequest.enabled());
         user.setUsername(createPatientRequest.username());
         user.setPassword(bCryptPasswordEncoder.encode(createPatientRequest.password()));
@@ -52,7 +51,6 @@ public class PatientMapper {
         String phoneNumber = updatePatientRequest.phoneNumber();
         LocalDate startDate = updatePatientRequest.startDate();
         PatientSubscriptionPlan patientSubscriptionPlan = updatePatientRequest.patientSubscriptionPlan();
-        String email = updatePatientRequest.email();
         String username = updatePatientRequest.username();
         String password = updatePatientRequest.password();
 
@@ -67,7 +65,6 @@ public class PatientMapper {
         if (phoneNumber != null) patientToBeUpdated.getUser().setPhoneNumber(phoneNumber);
         if (startDate != null) patientToBeUpdated.setStartDate(startDate);
         if (patientSubscriptionPlan != null) patientToBeUpdated.setSubscriptionPlan(patientSubscriptionPlan);
-        if (email != null) patientToBeUpdated.getUser().setEmail(email);
         if (username != null) patientToBeUpdated.getUser().setUsername(username);
         if (password != null) patientToBeUpdated.getUser().setPassword(password);
 

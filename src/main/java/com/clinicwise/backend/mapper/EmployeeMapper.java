@@ -4,8 +4,10 @@ import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
 import com.clinicwise.backend.dto.response.UserResponse;
+import com.clinicwise.backend.entity.Authority;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.User;
+import com.clinicwise.backend.enums.AuthorityType;
 import com.clinicwise.backend.enums.EmployeeRole;
 import com.clinicwise.backend.enums.Gender;
 import jakarta.persistence.*;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 
 @Component
 public class EmployeeMapper {
@@ -21,6 +25,10 @@ public class EmployeeMapper {
         employee.setCreatedAt(LocalDateTime.now());
         employee.setStartDate(createEmployeeRequest.startDate());
         employee.setRole(createEmployeeRequest.role());
+
+        Authority authority = new Authority();
+        authority.setAuthority(AuthorityType.ROLE_EMPLOYEE);
+        HashSet<Authority> authoritySet = new HashSet<>(Arrays.asList(authority));
 
         User user = new User();
         user.setFirstname(createEmployeeRequest.firstname());
@@ -31,10 +39,10 @@ public class EmployeeMapper {
         user.setDocumentId(createEmployeeRequest.documentId());
         user.setAddress(createEmployeeRequest.address());
         user.setPhoneNumber(createEmployeeRequest.phoneNumber());
-        user.setEmail(createEmployeeRequest.email());
-        user.setEnabled(createEmployeeRequest.enabled());
+        user.setEnabled(true);
         user.setUsername(createEmployeeRequest.username());
         user.setPassword(createEmployeeRequest.password());
+        user.setAuthorities(authoritySet);
 
         employee.setUser(user);
 
@@ -50,7 +58,6 @@ public class EmployeeMapper {
         String nationality = updateEmployeeRequest.nationality();
         String address = updateEmployeeRequest.address();
         String phoneNumber = updateEmployeeRequest.phoneNumber();
-        String email = updateEmployeeRequest.email();
         EmployeeRole role = updateEmployeeRequest.role();
         String documentId = updateEmployeeRequest.documentId();
         String username = updateEmployeeRequest.username();
@@ -65,7 +72,6 @@ public class EmployeeMapper {
         if (nationality != null && !nationality.isEmpty()) employeeToBeUpdated.getUser().setNationality(nationality);
         if (address != null && !address.isEmpty()) employeeToBeUpdated.getUser().setAddress(address);
         if (phoneNumber != null && !phoneNumber.isEmpty()) employeeToBeUpdated.getUser().setPhoneNumber(phoneNumber);
-        if (email != null && !email.isEmpty()) employeeToBeUpdated.getUser().setEmail(email);
         if (role != null) employeeToBeUpdated.setRole(role);
         if (documentId != null && !documentId.isEmpty()) employeeToBeUpdated.getUser().setDocumentId(documentId);
         if (username != null) employeeToBeUpdated.getUser().setUsername(username);

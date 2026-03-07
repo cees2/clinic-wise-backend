@@ -24,7 +24,6 @@ public class UserMapper {
                 user.getAddress(),
                 user.getDateOfBirth(),
                 user.getDocumentId(),
-                user.getEmail(),
                 user.getEnabled(),
                 user.getNationality(),
                 user.getPhoneNumber(),

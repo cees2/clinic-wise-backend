@@ -14,7 +14,6 @@ public record UpdateEmployeeRequest(
         String nationality,
         String address,
         String phoneNumber,
-        String email,
         EmployeeRole role,
         String documentId,
         String username,

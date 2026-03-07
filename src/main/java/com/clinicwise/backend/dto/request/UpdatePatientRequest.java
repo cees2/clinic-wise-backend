@@ -15,7 +15,6 @@ public record UpdatePatientRequest(
         String nationality,
         String phoneNumber,
         LocalDate startDate,
-        String email,
         PatientSubscriptionPlan patientSubscriptionPlan,
         String username,
         String password

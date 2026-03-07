@@ -1,5 +1,6 @@
 package com.clinicwise.backend.controller;
 
+import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateAppointmentRequest;
 import com.clinicwise.backend.dto.request.UpdateAppointmentRequest;
 import com.clinicwise.backend.dto.response.AppointmentResponse;
@@ -20,7 +21,7 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public List<AppointmentResponse> getAllAppointments(){
+    public ListResponse<AppointmentResponse> getAllAppointments(){
         return appointmentService.getAllAppointments();
     }
 

@@ -1,15 +1,14 @@
 package com.clinicwise.backend.controller;
 
+import com.clinicwise.backend.api.response.ApiResponse;
+import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
 import com.clinicwise.backend.service.EmployeeService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/employees")
@@ -21,12 +20,12 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public List<EmployeeResponse> getAllEmployees() {
+    public ListResponse<EmployeeResponse> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
     @GetMapping("/{employeeId}")
-    public EmployeeResponse getEmployee(@PathVariable int employeeId) {
+    public ApiResponse<EmployeeResponse> getEmployee(@PathVariable int employeeId) {
         return employeeService.getEmployee(employeeId);
     }
 

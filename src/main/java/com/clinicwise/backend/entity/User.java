@@ -36,8 +36,6 @@ public class User {
     private String nationality;
     @Column(name = "document_id", nullable = false, unique = true)
     private String documentId;
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "username", referencedColumnName = "username")
     private Set<Authority> authorities;
@@ -132,14 +130,6 @@ public class User {
 
     public void setDocumentId(String documentId) {
         this.documentId = documentId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public Set<Authority> getAuthorities() {return authorities;}

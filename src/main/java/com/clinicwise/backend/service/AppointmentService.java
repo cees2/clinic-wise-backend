@@ -1,5 +1,6 @@
 package com.clinicwise.backend.service;
 
+import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateAppointmentRequest;
 import com.clinicwise.backend.dto.request.UpdateAppointmentRequest;
 import com.clinicwise.backend.dto.response.AppointmentResponse;
@@ -32,11 +33,14 @@ public class AppointmentService {
         this.patientRepository = patientRepository;
     }
 
-    public List<AppointmentResponse> getAllAppointments() {
-        return appointmentRepository.findAll()
+    public ListResponse<AppointmentResponse> getAllAppointments() {
+        List<AppointmentResponse> appointments = appointmentRepository.findAll()
                 .stream()
                 .map(AppointmentMapper::toResponse)
                 .toList();
+        long count = appointmentRepository.count();
+
+        return ListResponse.toResponse(appointments, count);
     }
 
     public AppointmentResponse getAppointment(int appointmentId) {

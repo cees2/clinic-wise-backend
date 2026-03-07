@@ -1,5 +1,7 @@
 package com.clinicwise.backend.service;
 
+import com.clinicwise.backend.api.response.ApiResponse;
+import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
@@ -29,23 +31,24 @@ public class EmployeeService {
         this.userRepository = userRepository;
     }
 
-    public List<EmployeeResponse> getAllEmployees() {
+    public ListResponse<EmployeeResponse> getAllEmployees() {
         List<Employee> employees = employeeRepository.findAll();
+        List<EmployeeResponse> patientsList = employees.stream().map(EmployeeMapper::toResponse).toList();
+        long count = employeeRepository.count();
 
-        return employees.stream().map(EmployeeMapper::toResponse).toList();
+        return ListResponse.toResponse(patientsList, count);
     }
 
-    public EmployeeResponse getEmployee(int id) {
+    public ApiResponse<EmployeeResponse> getEmployee(int id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Could not find an user with id: " + id));
 
-        return EmployeeMapper.toResponse(employee);
+        return ApiResponse.toResponse(EmployeeMapper.toResponse(employee));
     }
 
     @Transactional
     public EmployeeResponse createEmployee(CreateEmployeeRequest createEmployeeRequest) {
         assertNoDuplicateUser(null,
                 createEmployeeRequest.documentId(),
-                createEmployeeRequest.email(),
                 createEmployeeRequest.phoneNumber(),
                 createEmployeeRequest.username()
         );
@@ -64,7 +67,6 @@ public class EmployeeService {
         assertNoDuplicateUser(
                 employeeId,
                 updateEmployeeRequest.documentId(),
-                updateEmployeeRequest.email(),
                 updateEmployeeRequest.phoneNumber(),
                 updateEmployeeRequest.username()
         );
@@ -81,11 +83,11 @@ public class EmployeeService {
         employeeRepository.delete(employeeToBeDeleted);
     }
 
-    private void assertNoDuplicateUser(Integer employeeId, String documentId, String email, String phoneNumber, String username) {
+    private void assertNoDuplicateUser(Integer employeeId, String documentId, String phoneNumber, String username) {
         List<User> usersWithSimilarData = userRepository
                 .findAll(
                         UserSpecifications
-                                .hasDocumentIDOrEmailOrPhoneNumberOrUserName(documentId, email, phoneNumber,username)
+                                .hasDocumentIDOrPhoneNumberOrUserName(documentId, phoneNumber,username)
                 );
 
         if (!usersWithSimilarData.isEmpty()) {
