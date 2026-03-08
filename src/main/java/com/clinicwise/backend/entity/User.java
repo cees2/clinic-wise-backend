@@ -18,7 +18,7 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
     @Column(name = "enabled", nullable = false)
-    private Boolean enabled;
+    private boolean enabled;
     @Column(name = "firstname", nullable = false)
     private String firstname;
     @Column(name = "lastname", nullable = false)
@@ -36,8 +36,7 @@ public class User {
     private String nationality;
     @Column(name = "document_id", nullable = false, unique = true)
     private String documentId;
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "username", referencedColumnName = "username")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Authority> authorities;
 
     public Integer getId() {return id;}
@@ -60,11 +59,11 @@ public class User {
         this.password = password;
     }
 
-    public Boolean getEnabled() {
+    public boolean getEnabled() {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 

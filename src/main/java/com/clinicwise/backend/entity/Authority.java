@@ -12,9 +12,12 @@ public class Authority {
     private Integer id;
     @Enumerated(EnumType.STRING)
     @Column(name = "authority", nullable = false)
-    AuthorityType authority;
-    @Column(name = "username")
-    String username;
+    private AuthorityType authority;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    @Column(name = "username", nullable = false)
+    private String username;
 
     public Integer getId() {
         return id;
@@ -30,6 +33,14 @@ public class Authority {
 
     public void setAuthority(AuthorityType authority) {
         this.authority = authority;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getUsername() {

@@ -28,6 +28,7 @@ public class EmployeeMapper {
 
         Authority authority = new Authority();
         authority.setAuthority(AuthorityType.ROLE_EMPLOYEE);
+        authority.setUsername(createEmployeeRequest.username());
         HashSet<Authority> authoritySet = new HashSet<>(Arrays.asList(authority));
 
         User user = new User();
@@ -42,6 +43,9 @@ public class EmployeeMapper {
         user.setEnabled(true);
         user.setUsername(createEmployeeRequest.username());
         user.setPassword(createEmployeeRequest.password());
+
+        authority.setUser(user);
+
         user.setAuthorities(authoritySet);
 
         employee.setUser(user);

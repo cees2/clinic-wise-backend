@@ -30,12 +30,12 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public EmployeeResponse createEmployee(@Valid @RequestBody CreateEmployeeRequest createEmployeeRequest) {
+    public ApiResponse<EmployeeResponse> createEmployee(@Valid @RequestBody CreateEmployeeRequest createEmployeeRequest) {
         return employeeService.createEmployee(createEmployeeRequest);
     }
 
     @PatchMapping("/{employeeId}")
-    public EmployeeResponse updateEmployee(@PathVariable int employeeId, @RequestBody UpdateEmployeeRequest updateEmployeeRequest){
+    public ApiResponse<EmployeeResponse> updateEmployee(@PathVariable int employeeId, @RequestBody UpdateEmployeeRequest updateEmployeeRequest){
         return employeeService.updateEmployee(employeeId, updateEmployeeRequest);
     }
 

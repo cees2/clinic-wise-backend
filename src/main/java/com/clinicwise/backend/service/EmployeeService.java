@@ -46,7 +46,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    public EmployeeResponse createEmployee(CreateEmployeeRequest createEmployeeRequest) {
+    public ApiResponse<EmployeeResponse> createEmployee(CreateEmployeeRequest createEmployeeRequest) {
         assertNoDuplicateUser(null,
                 createEmployeeRequest.documentId(),
                 createEmployeeRequest.phoneNumber(),
@@ -54,25 +54,26 @@ public class EmployeeService {
         );
 
         Employee employee = employeeMapper.createEmployeeFromRequest(createEmployeeRequest);
+
         employeeRepository.save(employee);
 
-        return EmployeeMapper.toResponse(employee);
+        return ApiResponse.toResponse(EmployeeMapper.toResponse(employee));
     }
 
     @Transactional
-    public EmployeeResponse updateEmployee(int employeeId, UpdateEmployeeRequest updateEmployeeRequest) {
+    public ApiResponse<EmployeeResponse> updateEmployee(int employeeId, UpdateEmployeeRequest updateEmployeeRequest) {
         Employee employeeToBeUpdated = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find an employee with given ID"));
 
         assertNoDuplicateUser(
-                employeeId,
+                employeeToBeUpdated.getUser().getId(),
                 updateEmployeeRequest.documentId(),
                 updateEmployeeRequest.phoneNumber(),
                 updateEmployeeRequest.username()
         );
         EmployeeMapper.updateEmployeeFromRequest(updateEmployeeRequest, employeeToBeUpdated);
 
-        return EmployeeMapper.toResponse(employeeToBeUpdated);
+        return ApiResponse.toResponse(EmployeeMapper.toResponse(employeeToBeUpdated));
     }
 
     @Transactional
@@ -83,14 +84,14 @@ public class EmployeeService {
         employeeRepository.delete(employeeToBeDeleted);
     }
 
-    private void assertNoDuplicateUser(Integer employeeId, String documentId, String phoneNumber, String username) {
+    private void assertNoDuplicateUser(Integer userId, String documentId, String phoneNumber, String username) {
         List<User> usersWithSimilarData = userRepository
                 .findAll(
                         UserSpecifications
-                                .hasDocumentIDOrPhoneNumberOrUserName(documentId, phoneNumber,username)
+                                .hasDocumentIDOrPhoneNumberOrUserName(documentId, phoneNumber, username)
                 );
 
-        if (!usersWithSimilarData.isEmpty()) {
+        if (!usersWithSimilarData.isEmpty() && !usersWithSimilarData.getFirst().getId().equals(userId)) {
             throw new UserWithProvidedDataExists();
         }
     }
