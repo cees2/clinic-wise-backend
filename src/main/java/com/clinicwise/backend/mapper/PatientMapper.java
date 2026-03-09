@@ -4,14 +4,18 @@ import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
 import com.clinicwise.backend.dto.response.UserResponse;
+import com.clinicwise.backend.entity.Authority;
 import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.entity.User;
+import com.clinicwise.backend.enums.AuthorityType;
 import com.clinicwise.backend.enums.Gender;
 import com.clinicwise.backend.enums.PatientSubscriptionPlan;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Set;
 
 public class PatientMapper {
     public static Patient createPatientFromRequest(CreatePatientRequest createPatientRequest) {
@@ -22,7 +26,13 @@ public class PatientMapper {
         patient.setCreatedAt(LocalDateTime.now());
         patient.setSubscriptionPlan(createPatientRequest.patientSubscriptionPlan());
 
+        Authority authority = new Authority();
+        authority.setUsername(createPatientRequest.username());
+        authority.setAuthority(AuthorityType.ROLE_PATIENT);
+        Set<Authority> authorities = Set.of(authority);
+
         User user = new User();
+        authority.setUser(user);
         user.setFirstname(createPatientRequest.firstname());
         user.setLastname(createPatientRequest.lastname());
         user.setGender(createPatientRequest.gender());
@@ -31,9 +41,10 @@ public class PatientMapper {
         user.setAddress(createPatientRequest.address());
         user.setNationality(createPatientRequest.nationality());
         user.setPhoneNumber(createPatientRequest.phoneNumber());
-        user.setEnabled(createPatientRequest.enabled());
         user.setUsername(createPatientRequest.username());
         user.setPassword(bCryptPasswordEncoder.encode(createPatientRequest.password()));
+        user.setEnabled(true);
+        user.setAuthorities(authorities);
 
         patient.setUser(user);
 

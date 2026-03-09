@@ -1,5 +1,6 @@
 package com.clinicwise.backend.controller;
 
+import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
@@ -26,17 +27,17 @@ public class PatientController {
     }
 
     @GetMapping("/{patientId}")
-    PatientResponse getPatient(@PathVariable int patientId) {
+    ApiResponse<PatientResponse> getPatient(@PathVariable int patientId) {
         return patientService.getPatient(patientId);
     }
 
     @PatchMapping("/{patientId}")
-    PatientResponse updatePatient(@PathVariable int patientId, @RequestBody UpdatePatientRequest updatePatientRequest) {
+    ApiResponse<PatientResponse> updatePatient(@PathVariable int patientId, @RequestBody UpdatePatientRequest updatePatientRequest) {
         return patientService.updatePatient(patientId, updatePatientRequest);
     }
 
     @PostMapping
-    PatientResponse createPatient(@Valid @RequestBody CreatePatientRequest createPatientRequest) {
+    ApiResponse<PatientResponse> createPatient(@Valid @RequestBody CreatePatientRequest createPatientRequest) {
         return patientService.createPatient(createPatientRequest);
     }
 

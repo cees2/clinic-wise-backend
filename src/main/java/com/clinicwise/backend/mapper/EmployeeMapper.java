@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class EmployeeMapper {
@@ -29,7 +29,7 @@ public class EmployeeMapper {
         Authority authority = new Authority();
         authority.setAuthority(AuthorityType.ROLE_EMPLOYEE);
         authority.setUsername(createEmployeeRequest.username());
-        HashSet<Authority> authoritySet = new HashSet<>(Arrays.asList(authority));
+        Set<Authority> authoritySet = Set.of(authority);
 
         User user = new User();
         user.setFirstname(createEmployeeRequest.firstname());

@@ -17,16 +17,16 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiError> validationDataIntegrityHandler(DataIntegrityViolationException exception){
+    public ResponseEntity<ApiError> validationDataIntegrityHandler(DataIntegrityViolationException exception) {
         Throwable error = exception.getMostSpecificCause();
         String message = "Invalid data provided";
 
-        if(error instanceof SQLException SQLException){
+        if (error instanceof SQLException SQLException) {
             int errorCode = SQLException.getErrorCode();
 
-            if(errorCode == 1062){
+            if (errorCode == 1062) {
                 message = "Resource already exists";
-            } else if(errorCode == 1406){
+            } else if (errorCode == 1406) {
                 message = "Data too long";
             }
         }
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiError> runtimeExceptionHandler(RuntimeException exception){
+    public ResponseEntity<ApiError> runtimeExceptionHandler(RuntimeException exception) {
         ApiError error = new ApiError(ErrorCode.INTERNAL_ERROR, exception.getMessage());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);

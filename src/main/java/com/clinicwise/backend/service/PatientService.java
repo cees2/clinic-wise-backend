@@ -1,5 +1,6 @@
 package com.clinicwise.backend.service;
 
+import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
@@ -35,31 +36,32 @@ public class PatientService {
         return ListResponse.toResponse(patientsList, patientsCount);
     }
 
-    public PatientResponse getPatient(int patientId) {
+    public ApiResponse<PatientResponse> getPatient(int patientId) {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a patient with ID: " + patientId));
 
-        return PatientMapper.toResponse(patient);
+        return ApiResponse.toResponse(PatientMapper.toResponse(patient));
     }
 
     @Transactional
-    public PatientResponse updatePatient(int patientId, UpdatePatientRequest updatePatientRequest) {
+    public ApiResponse<PatientResponse> updatePatient(int patientId, UpdatePatientRequest updatePatientRequest) {
+        Patient patientToBeUpdated = patientRepository.findById(patientId)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find a patient with ID: " + patientId));
+
         assertNoDuplicatePatient(
-                patientId,
+                patientToBeUpdated.getUser().getId(),
                 updatePatientRequest.documentId(),
                 updatePatientRequest.phoneNumber(),
                 updatePatientRequest.username()
         );
-        Patient patientToBeUpdated = patientRepository.findById(patientId)
-                .orElseThrow(() -> new EntityNotFoundException("Could not find a patient with ID: " + patientId));
 
         PatientMapper.updatePatientFromRequest(updatePatientRequest, patientToBeUpdated);
 
-        return PatientMapper.toResponse(patientToBeUpdated);
+        return ApiResponse.toResponse(PatientMapper.toResponse(patientToBeUpdated));
     }
 
     @Transactional
-    public PatientResponse createPatient(CreatePatientRequest createPatientRequest) {
+    public ApiResponse<PatientResponse> createPatient(CreatePatientRequest createPatientRequest) {
         assertNoDuplicatePatient(
                 null,
                 createPatientRequest.documentId(),
@@ -72,7 +74,7 @@ public class PatientService {
         userRepository.save(patient.getUser());
         patientRepository.save(patient);
 
-        return PatientMapper.toResponse(patient);
+        return ApiResponse.toResponse(PatientMapper.toResponse(patient));
     }
 
     @Transactional
@@ -90,7 +92,7 @@ public class PatientService {
                                 .hasDocumentIDOrPhoneNumberOrUserName(documentId, phoneNumber, username)
                 );
 
-        if (!usersWithSimilarData.isEmpty()) {
+        if (!usersWithSimilarData.isEmpty() && !usersWithSimilarData.getFirst().getId().equals(patientId)) {
             throw new UserWithProvidedDataExists();
         }
     }

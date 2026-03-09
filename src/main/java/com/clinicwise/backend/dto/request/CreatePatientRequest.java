@@ -29,8 +29,6 @@ public record CreatePatientRequest(
         @NotNull
         PatientSubscriptionPlan
         patientSubscriptionPlan,
-        @NotNull
-        Boolean enabled,
         @NotBlank
         String username,
         @NotBlank
