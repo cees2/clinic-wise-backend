@@ -5,10 +5,13 @@ import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
+import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/employees")
@@ -44,5 +47,10 @@ public class EmployeeController {
         employeeService.deleteEmployee(employeeId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search_select")
+    public ApiResponse<List<SearchSelect>> getSearchSelect(){
+        return employeeService.getSearchSelect();
     }
 }

@@ -5,6 +5,7 @@ import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
+import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.service.PatientService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -47,4 +48,10 @@ public class PatientController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search_select")
+    public ApiResponse<List<SearchSelect>> getSearchSelect(){
+        return patientService.getSearchSelect();
+    }
+
 }

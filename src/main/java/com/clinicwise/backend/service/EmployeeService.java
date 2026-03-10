@@ -5,6 +5,7 @@ import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
+import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
@@ -82,6 +83,13 @@ public class EmployeeService {
                 .orElseThrow(() -> new EntityNotFoundException("Could not find an employee with given ID"));
 
         employeeRepository.delete(employeeToBeDeleted);
+    }
+
+    public ApiResponse<List<SearchSelect>> getSearchSelect(){
+        List<Employee> employees = employeeRepository.findAll();
+        List<SearchSelect> employeesSearchSelect = employees.stream().map(EmployeeMapper::toSearchSelect).toList();
+
+        return ApiResponse.toResponse(employeesSearchSelect);
     }
 
     private void assertNoDuplicateUser(Integer userId, String documentId, String phoneNumber, String username) {

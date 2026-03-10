@@ -3,6 +3,7 @@ package com.clinicwise.backend.mapper;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
+import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.dto.response.UserResponse;
 import com.clinicwise.backend.entity.Authority;
 import com.clinicwise.backend.entity.Patient;
@@ -91,5 +92,11 @@ public class PatientMapper {
                 patient.getSubscriptionPlan(),
                 userResponse
         );
+    }
+
+    public static SearchSelect toSearchSelect(Patient patient){
+        String name = patient.getUser().getFirstname() + " " + patient.getUser().getLastname();
+
+        return new SearchSelect(patient.getId(), name);
     }
 }

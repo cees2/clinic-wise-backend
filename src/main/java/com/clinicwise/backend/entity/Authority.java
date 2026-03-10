@@ -1,6 +1,7 @@
 package com.clinicwise.backend.entity;
 
 import com.clinicwise.backend.enums.AuthorityType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,6 +16,7 @@ public class Authority {
     private AuthorityType authority;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
     @Column(name = "username", nullable = false)
     private String username;

@@ -1,5 +1,6 @@
 package com.clinicwise.backend.service;
 
+import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateAppointmentRequest;
 import com.clinicwise.backend.dto.request.UpdateAppointmentRequest;
@@ -43,15 +44,15 @@ public class AppointmentService {
         return ListResponse.toResponse(appointments, count);
     }
 
-    public AppointmentResponse getAppointment(int appointmentId) {
+    public ApiResponse<AppointmentResponse> getAppointment(int appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find an appointment with ID: " + appointmentId));
 
-        return AppointmentMapper.toResponse(appointment);
+        return ApiResponse.toResponse(AppointmentMapper.toResponse(appointment));
     }
 
     @Transactional
-    public AppointmentResponse createAppointment(CreateAppointmentRequest createAppointmentRequest) {
+    public ApiResponse<AppointmentResponse> createAppointment(CreateAppointmentRequest createAppointmentRequest) {
         Integer patientId = createAppointmentRequest.patientId();
         Integer employeeId = createAppointmentRequest.employeeId();
         PatientEmployee patientEmployee = checkIfPatientAndEmployeeExists(patientId, employeeId);
@@ -60,11 +61,11 @@ public class AppointmentService {
 
         appointmentRepository.save(appointment);
 
-        return AppointmentMapper.toResponse(appointment);
+        return ApiResponse.toResponse(AppointmentMapper.toResponse(appointment));
     }
 
     @Transactional
-    public AppointmentResponse updateAppointment(int appointmentId, UpdateAppointmentRequest updateAppointmentRequest) {
+    public ApiResponse<AppointmentResponse> updateAppointment(int appointmentId, UpdateAppointmentRequest updateAppointmentRequest) {
         Appointment appointmentToBeUpdated = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find an appointment with ID: " + appointmentId));
         Integer patientId = updateAppointmentRequest.patientId();
@@ -73,7 +74,7 @@ public class AppointmentService {
 
         appointmentMapper.updateAppointmentFromRequest(updateAppointmentRequest, appointmentToBeUpdated, patientEmployee.employee(), patientEmployee.patient());
 
-        return AppointmentMapper.toResponse(appointmentToBeUpdated);
+        return ApiResponse.toResponse(AppointmentMapper.toResponse(appointmentToBeUpdated));
     }
 
     @Transactional

@@ -21,10 +21,10 @@ public class AppointmentMapper {
         appointment.setCreatedAt(LocalDateTime.now());
         appointment.setDuration(createAppointmentRequest.duration());
         appointment.setStartDate(createAppointmentRequest.startDate());
-        appointment.setStatus(createAppointmentRequest.status());
         appointment.setAdditionalNote(createAppointmentRequest.additionalNote());
         appointment.setEmployee(employee);
         appointment.setPatient(patient);
+        appointment.setStatus(AppointmentStatus.SCHEDULED);
 
         return appointment;
     }

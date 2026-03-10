@@ -3,6 +3,7 @@ package com.clinicwise.backend.mapper;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
+import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.dto.response.UserResponse;
 import com.clinicwise.backend.entity.Authority;
 import com.clinicwise.backend.entity.Employee;
@@ -94,5 +95,11 @@ public class EmployeeMapper {
                 employee.getRole(),
                 userResponse
         );
+    }
+
+    public static SearchSelect toSearchSelect(Employee employee){
+        String name = employee.getUser().getFirstname() + " " + employee.getUser().getLastname();
+
+        return new SearchSelect(employee.getId(), name);
     }
 }

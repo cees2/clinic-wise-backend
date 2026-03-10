@@ -1,5 +1,6 @@
 package com.clinicwise.backend.controller;
 
+import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateAppointmentRequest;
 import com.clinicwise.backend.dto.request.UpdateAppointmentRequest;
@@ -26,17 +27,17 @@ public class AppointmentController {
     }
 
     @GetMapping("/{appointmentId}")
-    public AppointmentResponse getAppointment(@PathVariable int appointmentId){
+    public ApiResponse<AppointmentResponse> getAppointment(@PathVariable int appointmentId){
         return appointmentService.getAppointment(appointmentId);
     }
 
     @PostMapping
-    public AppointmentResponse createAppointment(@Valid @RequestBody CreateAppointmentRequest createAppointmentRequest){
+    public ApiResponse<AppointmentResponse> createAppointment(@Valid @RequestBody CreateAppointmentRequest createAppointmentRequest){
         return appointmentService.createAppointment(createAppointmentRequest);
     }
 
     @PatchMapping("/{appointmentId}")
-    public AppointmentResponse updateAppointment(@PathVariable int appointmentId, @RequestBody UpdateAppointmentRequest updateAppointmentRequest){
+    public ApiResponse<AppointmentResponse> updateAppointment(@PathVariable int appointmentId, @RequestBody UpdateAppointmentRequest updateAppointmentRequest){
         return appointmentService.updateAppointment(appointmentId,updateAppointmentRequest);
     }
 

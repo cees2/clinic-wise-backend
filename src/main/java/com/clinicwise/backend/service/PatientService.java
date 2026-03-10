@@ -5,6 +5,7 @@ import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
+import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
@@ -83,6 +84,13 @@ public class PatientService {
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a patient with ID: " + patientId));
 
         patientRepository.delete(patientToBeUpdated);
+    }
+
+    public ApiResponse<List<SearchSelect>> getSearchSelect(){
+        List<Patient> employees = patientRepository.findAll();
+        List<SearchSelect> employeesSearchSelect = employees.stream().map(PatientMapper::toSearchSelect).toList();
+
+        return ApiResponse.toResponse(employeesSearchSelect);
     }
 
     private void assertNoDuplicatePatient(Integer patientId, String documentId, String phoneNumber, String username) {

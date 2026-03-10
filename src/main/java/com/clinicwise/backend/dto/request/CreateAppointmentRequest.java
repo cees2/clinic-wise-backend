@@ -14,8 +14,7 @@ public record CreateAppointmentRequest(
         @NotNull
         @FutureOrPresent
         LocalDateTime startDate,
-        @NotNull
-        AppointmentStatus status,
+        @NotBlank
         String additionalNote,
         @NotNull
         Integer patientId,
