@@ -1,5 +1,7 @@
 package com.clinicwise.backend.controller;
 
+import com.clinicwise.backend.api.response.ApiResponse;
+import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateRoomRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomRequest;
 import com.clinicwise.backend.dto.response.RoomResponse;
@@ -20,22 +22,22 @@ public class RoomController {
     }
 
     @GetMapping
-    public List<RoomResponse> getAllRooms(){
+    public ListResponse<RoomResponse> getAllRooms(){
         return roomService.getAllRooms();
     }
 
     @GetMapping("/{roomId}")
-    public RoomResponse getRoom(@PathVariable int roomId){
+    public ApiResponse<RoomResponse> getRoom(@PathVariable int roomId){
         return roomService.getRoom(roomId);
     }
 
     @PostMapping
-    public RoomResponse createRoom(@RequestBody CreateRoomRequest createRoomRequest){
+    public ApiResponse<RoomResponse> createRoom(@RequestBody CreateRoomRequest createRoomRequest){
         return roomService.createRoom(createRoomRequest);
     }
 
     @PatchMapping("/{roomId}")
-    public RoomResponse updateRoom(@PathVariable int roomId, @RequestBody UpdateRoomRequest updateRoomRequest){
+    public ApiResponse<RoomResponse> updateRoom(@PathVariable int roomId, @RequestBody UpdateRoomRequest updateRoomRequest){
         return roomService.updateRoom(roomId, updateRoomRequest);
     }
 

@@ -1,5 +1,7 @@
 package com.clinicwise.backend.service;
 
+import com.clinicwise.backend.api.response.ApiResponse;
+import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.response.RoomOccupancyResponse;
@@ -22,13 +24,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.antlr.v4.runtime.tree.xpath.XPath.findAll;
+
 @Service
 public class RoomOccupancyService {
     private RoomOccupancyRepository roomOccupancyRepository;
     private RoomOccupancyMapper roomOccupancyMapper;
     private RoomRepository roomRepository;
     private EmployeeRepository employeeRepository;
-
 
     public RoomOccupancyService(RoomOccupancyRepository roomOccupancyRepository, RoomOccupancyMapper roomOccupancyMapper, RoomRepository roomRepository, EmployeeRepository employeeRepository) {
         this.roomOccupancyRepository = roomOccupancyRepository;
@@ -37,22 +40,25 @@ public class RoomOccupancyService {
         this.employeeRepository = employeeRepository;
     }
 
-    public List<RoomOccupancyResponse> getAllRoomOccupancies() {
-        return roomOccupancyRepository.findAll()
+    public ListResponse<RoomOccupancyResponse> getAllRoomOccupancies() {
+        List<RoomOccupancyResponse> roomOccupancies = roomOccupancyRepository.findAll()
                 .stream()
                 .map(RoomOccupancyMapper::toResponse)
                 .toList();
+        long count = roomOccupancyRepository.count();
+
+        return ListResponse.toResponse(roomOccupancies, count);
     }
 
-    public RoomOccupancyResponse getRoomOccupancy(int roomOccupancyId) {
+    public ApiResponse<RoomOccupancyResponse> getRoomOccupancy(int roomOccupancyId) {
         RoomOccupancy roomOccupancy = roomOccupancyRepository.findById(roomOccupancyId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a room occupancy with ID: " + roomOccupancyId));
 
-        return RoomOccupancyMapper.toResponse(roomOccupancy);
+        return ApiResponse.toResponse(RoomOccupancyMapper.toResponse(roomOccupancy));
     }
 
     @Transactional
-    public RoomOccupancyResponse createRoomOccupancy(CreateRoomOccupancyRequest createRoomOccupancyRequest) {
+    public ApiResponse<RoomOccupancyResponse> createRoomOccupancy(CreateRoomOccupancyRequest createRoomOccupancyRequest) {
         RoomEmployee roomEmployee = checkIfRoomAndEmployeeExists(createRoomOccupancyRequest.roomId(), createRoomOccupancyRequest.employeeId());
         checkIfEndTimeIfAfterStartTime(createRoomOccupancyRequest.startTime(), createRoomOccupancyRequest.endTime());
         findOverlappingRoomOccupancies(
@@ -70,11 +76,11 @@ public class RoomOccupancyService {
 
         roomOccupancyRepository.save(roomOccupancy);
 
-        return RoomOccupancyMapper.toResponse(roomOccupancy);
+        return ApiResponse.toResponse(RoomOccupancyMapper.toResponse(roomOccupancy));
     }
 
     @Transactional
-    public RoomOccupancyResponse updateRoomOccupancy(int roomOccupancyId, UpdateRoomOccupancyRequest updateRoomOccupancyRequest) {
+    public ApiResponse<RoomOccupancyResponse> updateRoomOccupancy(int roomOccupancyId, UpdateRoomOccupancyRequest updateRoomOccupancyRequest) {
         RoomOccupancy roomOccupancy = roomOccupancyRepository.findById(roomOccupancyId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a room occupancy with ID: " + roomOccupancyId));
 
@@ -89,7 +95,7 @@ public class RoomOccupancyService {
 
         roomOccupancyMapper.updateRoomOccupancyFromRequest(updateRoomOccupancyRequest, roomOccupancy, roomEmployee.room(), roomEmployee.employee());
 
-        return RoomOccupancyMapper.toResponse(roomOccupancy);
+        return ApiResponse.toResponse(RoomOccupancyMapper.toResponse(roomOccupancy));
     }
 
     @Transactional

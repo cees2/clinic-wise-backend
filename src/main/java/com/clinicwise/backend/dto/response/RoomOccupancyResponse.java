@@ -9,6 +9,7 @@ public record RoomOccupancyResponse(
         Room room,
         Employee employee,
         LocalDateTime startTime,
-        LocalDateTime endTime
+        LocalDateTime endTime,
+        Integer id
 ) {
 }

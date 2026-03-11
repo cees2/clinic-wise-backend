@@ -1,5 +1,7 @@
 package com.clinicwise.backend.controller;
 
+import com.clinicwise.backend.api.response.ApiResponse;
+import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.response.RoomOccupancyResponse;
@@ -20,22 +22,22 @@ public class RoomOccupancyController {
     }
 
     @GetMapping
-    public List<RoomOccupancyResponse> getAllRoomOccupancies() {
+    public ListResponse<RoomOccupancyResponse> getAllRoomOccupancies() {
         return roomOccupancyService.getAllRoomOccupancies();
     }
 
     @GetMapping("/{roomOccupancyId}")
-    public RoomOccupancyResponse getRoomOccupancy(@PathVariable int roomOccupancyId) {
+    public ApiResponse<RoomOccupancyResponse> getRoomOccupancy(@PathVariable int roomOccupancyId) {
         return roomOccupancyService.getRoomOccupancy(roomOccupancyId);
     }
 
     @PostMapping
-    public RoomOccupancyResponse createRoomOccupancy(@Valid @RequestBody CreateRoomOccupancyRequest createRoomOccupancyRequest) {
+    public ApiResponse<RoomOccupancyResponse> createRoomOccupancy(@Valid @RequestBody CreateRoomOccupancyRequest createRoomOccupancyRequest) {
         return roomOccupancyService.createRoomOccupancy(createRoomOccupancyRequest);
     }
 
     @PatchMapping("/{roomOccupancyId}")
-    public RoomOccupancyResponse updateRoomOccupancy(@PathVariable int roomOccupancyId, @RequestBody UpdateRoomOccupancyRequest updateRoomOccupancyRequest) {
+    public ApiResponse<RoomOccupancyResponse> updateRoomOccupancy(@PathVariable int roomOccupancyId, @RequestBody UpdateRoomOccupancyRequest updateRoomOccupancyRequest) {
         return roomOccupancyService.updateRoomOccupancy(roomOccupancyId, updateRoomOccupancyRequest);
     }
 

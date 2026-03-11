@@ -41,7 +41,8 @@ public class RoomOccupancyMapper {
                 roomOccupancy.getRoom(),
                 roomOccupancy.getEmployee(),
                 roomOccupancy.getStartTime(),
-                roomOccupancy.getEndTime()
+                roomOccupancy.getEndTime(),
+                roomOccupancy.getId()
         );
     }
 

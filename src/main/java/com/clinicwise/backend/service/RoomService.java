@@ -1,5 +1,7 @@
 package com.clinicwise.backend.service;
 
+import com.clinicwise.backend.api.response.ApiResponse;
+import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.dto.request.CreateRoomRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomRequest;
 import com.clinicwise.backend.dto.response.RoomResponse;
@@ -25,54 +27,57 @@ public class RoomService {
         this.roomMapper = roomMapper;
     }
 
-    public List<RoomResponse> getAllRooms() {
-        return roomRepository.findAll()
+    public ListResponse<RoomResponse> getAllRooms() {
+        List<RoomResponse> rooms = roomRepository.findAll()
                 .stream()
                 .map(RoomMapper::toResponse)
                 .toList();
+        long count = roomRepository.count();
+
+        return ListResponse.toResponse(rooms, count);
     }
 
-    public RoomResponse getRoom(int roomId) {
+    public ApiResponse<RoomResponse> getRoom(int roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("Could not find a room with ID: " + roomId));
 
-        return RoomMapper.toResponse(room);
+        return ApiResponse.toResponse(RoomMapper.toResponse(room));
     }
 
     @Transactional
-    public RoomResponse createRoom(CreateRoomRequest createRoomRequest) {
+    public ApiResponse<RoomResponse> createRoom(CreateRoomRequest createRoomRequest) {
         checkIfRoomWithMatchingNameExists(createRoomRequest.name());
         Room roomToBeCreated = roomMapper.createRoomFromRequest(createRoomRequest);
 
         roomRepository.save(roomToBeCreated);
 
-        return RoomMapper.toResponse(roomToBeCreated);
+        return ApiResponse.toResponse(RoomMapper.toResponse(roomToBeCreated));
     }
 
     @Transactional
-    public RoomResponse updateRoom(int roomId, UpdateRoomRequest updateRoomRequest) {
+    public ApiResponse<RoomResponse> updateRoom(int roomId, UpdateRoomRequest updateRoomRequest) {
         checkIfRoomWithMatchingNameExists(updateRoomRequest.name());
         Room roomToBeUpdated = roomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a room with ID: " + roomId));
 
         roomMapper.updateRoomFromRequest(updateRoomRequest, roomToBeUpdated);
 
-        return RoomMapper.toResponse(roomToBeUpdated);
+        return ApiResponse.toResponse(RoomMapper.toResponse(roomToBeUpdated));
     }
 
     @Transactional
-    public void deleteRoom(int roomId){
+    public void deleteRoom(int roomId) {
         Room roomToBeDeleted = roomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a room with ID: " + roomId));
 
         roomRepository.delete(roomToBeDeleted);
     }
 
-    public void checkIfRoomWithMatchingNameExists(String name){
-        if(name == null) return;
+    public void checkIfRoomWithMatchingNameExists(String name) {
+        if (name == null) return;
 
         Optional<Room> room = roomRepository.findOne(RoomSpecifications.hasName(name));
 
-        if(room.isPresent()){
+        if (room.isPresent()) {
             throw new RoomWithNameExists(name);
         }
     }
