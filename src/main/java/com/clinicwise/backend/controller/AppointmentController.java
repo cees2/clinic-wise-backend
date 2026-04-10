@@ -47,4 +47,9 @@ public class AppointmentController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/generate")
+    public ApiResponse<List<AppointmentResponse>> generate(){
+        return appointmentService.generateAppointments();
+    }
 }

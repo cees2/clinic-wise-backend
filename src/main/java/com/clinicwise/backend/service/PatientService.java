@@ -14,10 +14,13 @@ import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.repository.UserRepository;
 import com.clinicwise.backend.specification.UserSpecifications;
 import jakarta.persistence.EntityNotFoundException;
+import net.datafaker.Faker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class PatientService {
@@ -84,6 +87,17 @@ public class PatientService {
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a patient with ID: " + patientId));
 
         patientRepository.delete(patientToBeUpdated);
+    }
+
+    @Transactional
+    public ApiResponse<List<PatientResponse>> generatePatients(){
+        List<Patient> patients = PatientMapper.generateFakePatients();
+
+        return ApiResponse.toResponse(patients
+                .stream()
+                .map(PatientMapper::toResponse)
+                .toList()
+        );
     }
 
     public ApiResponse<List<SearchSelect>> getSearchSelect(){

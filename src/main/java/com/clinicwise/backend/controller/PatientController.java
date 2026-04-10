@@ -54,4 +54,8 @@ public class PatientController {
         return patientService.getSearchSelect();
     }
 
+    @PostMapping("/generate")
+    public ApiResponse<List<PatientResponse>> generate(){
+        return patientService.generatePatients();
+    }
 }

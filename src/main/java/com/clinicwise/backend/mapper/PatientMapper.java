@@ -11,11 +11,13 @@ import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.enums.AuthorityType;
 import com.clinicwise.backend.enums.Gender;
 import com.clinicwise.backend.enums.PatientSubscriptionPlan;
+import com.clinicwise.backend.faker.CustomFaker;
+import net.datafaker.Faker;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.time.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class PatientMapper {
@@ -94,9 +96,71 @@ public class PatientMapper {
         );
     }
 
-    public static SearchSelect toSearchSelect(Patient patient){
+    public static SearchSelect toSearchSelect(Patient patient) {
         String name = patient.getUser().getFirstname() + " " + patient.getUser().getLastname();
 
         return new SearchSelect(patient.getId(), name);
+    }
+
+    public static List<Patient> generateFakePatients() {
+        CustomFaker faker = new CustomFaker();
+        List<Patient> patients = new ArrayList<>();
+
+        for (int i = 0; i < 20; i++) {
+            Patient patient = new Patient();
+            User user = new User();
+            String username = faker.credentials().username();
+
+            Authority authority = new Authority();
+            authority.setUsername(username);
+            authority.setUser(user);
+            authority.setAuthority(AuthorityType.ROLE_PATIENT);
+
+            patient.setCreatedAt(LocalDateTime.now());
+            patient.setStartDate(randomDate7YearsTo1WeekAgo(faker));
+            patient.setUser(user);
+            patient.setSubscriptionPlan(faker.patientSubscriptionPlan().nextSubscriptionPlan());
+
+            user.setUsername(username);
+            user.setFirstname(faker.name().firstName());
+            user.setLastname(faker.name().lastName());
+            user.setEnabled(true);
+            user.setAddress(faker.address().fullAddress());
+            user.setDateOfBirth(randomDate60YearsTo20YearsAgo(faker));
+            user.setDocumentId(faker.letterify("???", true) + " " + faker.numerify("##"));
+            user.setNationality(faker.country().name());
+            user.setPhoneNumber(faker.phoneNumber().phoneNumber());
+        user.setGender(faker.gender().binaryTypes());
+//        user.setPassword();
+
+            user.setAuthorities(Set.of(authority));
+
+            patients.add(patient);
+        }
+
+        return patients;
+    }
+
+    private static LocalDate randomDate7YearsTo1WeekAgo(Faker faker) {
+        LocalDate start = LocalDate.now().minusYears(7);
+        LocalDate end = LocalDate.now().minusWeeks(1);
+
+        return getRandomDate(faker, start, end);
+    }
+
+    private static LocalDate randomDate60YearsTo20YearsAgo(Faker faker) {
+        LocalDate start = LocalDate.now().minusYears(60);
+        LocalDate end = LocalDate.now().minusYears(20);
+
+        return getRandomDate(faker, start, end);
+    }
+
+
+    private static LocalDate getRandomDate(Faker faker, LocalDate start, LocalDate end) {
+        Instant startInstant = start.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant endInstant = end.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant randomInstant = faker.timeAndDate().between(startInstant, endInstant);
+
+        return randomInstant.atZone(ZoneId.systemDefault()).toLocalDate();
     }
 }

@@ -14,9 +14,11 @@ import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.service.dto.PatientEmployee;
 import jakarta.persistence.EntityNotFoundException;
+import net.datafaker.Faker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,6 +85,20 @@ public class AppointmentService {
                 .orElseThrow(() -> new EntityNotFoundException("Could not find an appointment with ID: " + appointmentId));
 
         appointmentRepository.delete(appointmentToBeDeleted);
+    }
+
+    @Transactional
+    public ApiResponse<List<AppointmentResponse>> generateAppointments(){
+        Faker faker = new Faker();
+        List<Appointment> appointments = null;
+
+        appointmentRepository.saveAll(appointments);
+
+        return ApiResponse.toResponse(
+                appointments.stream()
+                .map(AppointmentMapper::toResponse)
+                .toList()
+        );
     }
 
     private PatientEmployee checkIfPatientAndEmployeeExists(Integer patientId, Integer employeeId) {

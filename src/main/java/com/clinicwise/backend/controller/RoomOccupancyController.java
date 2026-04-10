@@ -47,4 +47,9 @@ public class RoomOccupancyController {
 
         return ResponseEntity.noContent().build();
     }
+
+//    @PostMapping("/generate")
+//    public ResponseEntity<List<RoomOccupancyResponse>> generate(){
+//        return roomOccupancyService.generateRoomOccupancies();
+//    }
 }
