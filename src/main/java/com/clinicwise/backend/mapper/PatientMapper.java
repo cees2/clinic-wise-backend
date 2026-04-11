@@ -18,15 +18,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class PatientMapper {
     private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
-    private static final Map<String, Gender> genderMap = Map.of(
-            "Male", Gender.MALE,
-            "Female", Gender.FEMALE
-    );
 
     public static Patient createPatientFromRequest(CreatePatientRequest createPatientRequest) {
         Patient patient = new Patient();
@@ -113,30 +108,10 @@ public class PatientMapper {
 
         for (int i = 0; i < 20; i++) {
             Patient patient = new Patient();
-            User user = new User();
-            String username = faker.internet().emailAddress();
-            Gender gender = genderMap.get(faker.gender().binaryTypes());
-
-            Authority authority = new Authority();
-            authority.setUsername(username);
-            authority.setUser(user);
-            authority.setAuthority(AuthorityType.ROLE_PATIENT);
-
-            user.setUsername(username);
-            user.setPassword(bCryptPasswordEncoder.encode("pass1234"));
-            user.setFirstname(faker.name().firstName());
-            user.setLastname(faker.name().lastName());
-            user.setEnabled(true);
-            user.setAddress(faker.address().fullAddress());
-            user.setDateOfBirth(randomDate60YearsTo20YearsAgo(faker));
-            user.setDocumentId(faker.letterify("???", true) + " " + faker.numerify("##"));
-            user.setNationality(faker.country().name());
-            user.setPhoneNumber(faker.phoneNumber().phoneNumber());
-            user.setGender(gender);
-            user.setAuthorities(Set.of(authority));
+            User user = UserMapper.generateFakeUser();
 
             patient.setCreatedAt(LocalDateTime.now());
-            patient.setStartDate(randomDate7YearsTo1WeekAgo(faker));
+            patient.setStartDate(MapperUtils.randomDate7YearsTo1WeekAgo(faker));
             patient.setUser(user);
             patient.setSubscriptionPlan(faker.patientSubscriptionPlan().nextSubscriptionPlan());
 
@@ -144,28 +119,5 @@ public class PatientMapper {
         }
 
         return patients;
-    }
-
-    private static LocalDate randomDate7YearsTo1WeekAgo(Faker faker) {
-        LocalDate start = LocalDate.now().minusYears(7);
-        LocalDate end = LocalDate.now().minusWeeks(1);
-
-        return getRandomDate(faker, start, end);
-    }
-
-    private static LocalDate randomDate60YearsTo20YearsAgo(Faker faker) {
-        LocalDate start = LocalDate.now().minusYears(60);
-        LocalDate end = LocalDate.now().minusYears(20);
-
-        return getRandomDate(faker, start, end);
-    }
-
-
-    private static LocalDate getRandomDate(Faker faker, LocalDate start, LocalDate end) {
-        Instant startInstant = start.atStartOfDay(ZoneId.systemDefault()).toInstant();
-        Instant endInstant = end.atStartOfDay(ZoneId.systemDefault()).toInstant();
-        Instant randomInstant = faker.timeAndDate().between(startInstant, endInstant);
-
-        return randomInstant.atZone(ZoneId.systemDefault()).toLocalDate();
     }
 }

@@ -53,4 +53,9 @@ public class EmployeeController {
     public ApiResponse<List<SearchSelect>> getSearchSelect(){
         return employeeService.getSearchSelect();
     }
+
+    @PostMapping("/generate")
+    public ApiResponse<List<EmployeeResponse>> generate(){
+        return employeeService.generateEmployees();
+    }
 }

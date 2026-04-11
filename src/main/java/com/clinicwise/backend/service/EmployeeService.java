@@ -104,4 +104,17 @@ public class EmployeeService {
             throw new UserWithProvidedDataExists();
         }
     }
+
+    @Transactional
+    public ApiResponse<List<EmployeeResponse>> generateEmployees() {
+        List<Employee> employees = EmployeeMapper.generateFakeEmployees();
+
+        employeeRepository.saveAll(employees);
+
+        return ApiResponse.toResponse(employees
+                .stream()
+                .map(EmployeeMapper::toResponse)
+                .toList()
+        );
+    }
 }

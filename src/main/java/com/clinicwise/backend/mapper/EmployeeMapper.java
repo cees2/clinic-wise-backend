@@ -11,12 +11,14 @@ import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.enums.AuthorityType;
 import com.clinicwise.backend.enums.EmployeeRole;
 import com.clinicwise.backend.enums.Gender;
+import com.clinicwise.backend.faker.CustomFaker;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -101,5 +103,23 @@ public class EmployeeMapper {
         String name = employee.getUser().getFirstname() + " " + employee.getUser().getLastname();
 
         return new SearchSelect(employee.getId(), name);
+    }
+
+    public static List<Employee> generateFakeEmployees() {
+        CustomFaker faker = new CustomFaker();
+        List<Employee> employees = new ArrayList<>();
+
+        for (int i = 0; i < 20; i++) {
+            Employee employee = new Employee();
+            User user = UserMapper.generateFakeUser();
+
+            employee.setCreatedAt(LocalDateTime.now());
+            employee.setStartDate(MapperUtils.randomDate7YearsTo1WeekAgo(faker));
+            employee.setUser(user);
+            employee.setRole(faker.employeeRole().nextEmployeeRole());
+            employees.add(employee);
+        }
+
+        return employees;
     }
 }
