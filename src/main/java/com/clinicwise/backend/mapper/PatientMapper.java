@@ -18,12 +18,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class PatientMapper {
-    public static Patient createPatientFromRequest(CreatePatientRequest createPatientRequest) {
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
+    private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
+    private static final Map<String, Gender> genderMap = Map.of(
+            "Male", Gender.MALE,
+            "Female", Gender.FEMALE
+    );
 
+    public static Patient createPatientFromRequest(CreatePatientRequest createPatientRequest) {
         Patient patient = new Patient();
         patient.setStartDate(createPatientRequest.startDate());
         patient.setCreatedAt(LocalDateTime.now());
@@ -109,19 +114,16 @@ public class PatientMapper {
         for (int i = 0; i < 20; i++) {
             Patient patient = new Patient();
             User user = new User();
-            String username = faker.credentials().username();
+            String username = faker.internet().emailAddress();
+            Gender gender = genderMap.get(faker.gender().binaryTypes());
 
             Authority authority = new Authority();
             authority.setUsername(username);
             authority.setUser(user);
             authority.setAuthority(AuthorityType.ROLE_PATIENT);
 
-            patient.setCreatedAt(LocalDateTime.now());
-            patient.setStartDate(randomDate7YearsTo1WeekAgo(faker));
-            patient.setUser(user);
-            patient.setSubscriptionPlan(faker.patientSubscriptionPlan().nextSubscriptionPlan());
-
             user.setUsername(username);
+            user.setPassword(bCryptPasswordEncoder.encode("pass1234"));
             user.setFirstname(faker.name().firstName());
             user.setLastname(faker.name().lastName());
             user.setEnabled(true);
@@ -130,10 +132,13 @@ public class PatientMapper {
             user.setDocumentId(faker.letterify("???", true) + " " + faker.numerify("##"));
             user.setNationality(faker.country().name());
             user.setPhoneNumber(faker.phoneNumber().phoneNumber());
-        user.setGender(faker.gender().binaryTypes());
-//        user.setPassword();
-
+            user.setGender(gender);
             user.setAuthorities(Set.of(authority));
+
+            patient.setCreatedAt(LocalDateTime.now());
+            patient.setStartDate(randomDate7YearsTo1WeekAgo(faker));
+            patient.setUser(user);
+            patient.setSubscriptionPlan(faker.patientSubscriptionPlan().nextSubscriptionPlan());
 
             patients.add(patient);
         }

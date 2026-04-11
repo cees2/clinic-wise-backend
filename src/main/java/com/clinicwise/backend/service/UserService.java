@@ -45,9 +45,7 @@ public class UserService {
 
     public UserResponse getMe(String authorizationHeader) {
         String token = authorizationHeader.substring("Bearer ".length());
-
         String usernameFromToken = JWTService.extractUsername(token);
-
         User user = userRepository.findByUsername(usernameFromToken)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 

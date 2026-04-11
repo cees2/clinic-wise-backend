@@ -16,7 +16,6 @@ import com.clinicwise.backend.specification.UserSpecifications;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -78,7 +77,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    public void deleteEmployee(@PathVariable int employeeId) {
+    public void deleteEmployee(int employeeId) {
         Employee employeeToBeDeleted = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find an employee with given ID"));
 
@@ -87,7 +86,9 @@ public class EmployeeService {
 
     public ApiResponse<List<SearchSelect>> getSearchSelect(){
         List<Employee> employees = employeeRepository.findAll();
-        List<SearchSelect> employeesSearchSelect = employees.stream().map(EmployeeMapper::toSearchSelect).toList();
+        List<SearchSelect> employeesSearchSelect = employees.stream()
+                .map(EmployeeMapper::toSearchSelect)
+                .toList();
 
         return ApiResponse.toResponse(employeesSearchSelect);
     }

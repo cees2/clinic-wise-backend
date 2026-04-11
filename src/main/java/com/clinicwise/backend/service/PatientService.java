@@ -6,6 +6,7 @@ import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
 import com.clinicwise.backend.dto.response.SearchSelect;
+import com.clinicwise.backend.entity.Authority;
 import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
@@ -90,8 +91,10 @@ public class PatientService {
     }
 
     @Transactional
-    public ApiResponse<List<PatientResponse>> generatePatients(){
+    public ApiResponse<List<PatientResponse>> generatePatients() {
         List<Patient> patients = PatientMapper.generateFakePatients();
+
+        patientRepository.saveAll(patients);
 
         return ApiResponse.toResponse(patients
                 .stream()
@@ -100,7 +103,7 @@ public class PatientService {
         );
     }
 
-    public ApiResponse<List<SearchSelect>> getSearchSelect(){
+    public ApiResponse<List<SearchSelect>> getSearchSelect() {
         List<Patient> employees = patientRepository.findAll();
         List<SearchSelect> employeesSearchSelect = employees.stream().map(PatientMapper::toSearchSelect).toList();
 
