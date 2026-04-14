@@ -7,11 +7,14 @@ import com.clinicwise.backend.entity.Appointment;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.enums.AppointmentStatus;
+import com.clinicwise.backend.faker.CustomFaker;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class AppointmentMapper {
@@ -56,5 +59,31 @@ public class AppointmentMapper {
                 appointment.getPatient(),
                 appointment.getEmployee()
         );
+    }
+
+    public static List<Appointment> generateFakeAppointments(List<Patient> patients, List<Employee> employees) {
+        CustomFaker faker = new CustomFaker();
+        List<Appointment> appointments = new ArrayList<>();
+
+        for(int i = 0; i < 20; i++) {
+            Appointment appointment = new Appointment();
+            int randomPatientIndex = faker.random().nextInt(patients.size());
+            int randomEmployeeIndex = faker.random().nextInt(employees.size());
+            Patient randomPatient = patients.get(randomPatientIndex);
+            Employee randomEmployee = employees.get(randomEmployeeIndex);
+
+            appointment.setCreatedAt(LocalDateTime.now());
+            appointment.setDuration(faker.random().nextInt(1, 60));
+            appointment.setStartDate(MapperUtils.randomFutureDate60Days());
+            appointment.setStatus(faker.appointmentStatus().nextAppointmentStatus());
+            appointment.setAdditionalNote(faker.lorem().sentence());
+            appointment.setEmployee(randomEmployee);
+            appointment.setPatient(randomPatient);
+
+
+            appointments.add(appointment);
+        }
+
+        return appointments;
     }
 }

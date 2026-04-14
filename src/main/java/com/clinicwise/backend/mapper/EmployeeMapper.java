@@ -114,7 +114,7 @@ public class EmployeeMapper {
             User user = UserMapper.generateFakeUser();
 
             employee.setCreatedAt(LocalDateTime.now());
-            employee.setStartDate(MapperUtils.randomDate7YearsTo1WeekAgo(faker));
+            employee.setStartDate(MapperUtils.randomDate7YearsTo1WeekAgo());
             employee.setUser(user);
             employee.setRole(faker.employeeRole().nextEmployeeRole());
             employees.add(employee);

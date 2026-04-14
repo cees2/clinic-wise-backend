@@ -14,11 +14,9 @@ import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.service.dto.PatientEmployee;
 import jakarta.persistence.EntityNotFoundException;
-import net.datafaker.Faker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,8 +87,9 @@ public class AppointmentService {
 
     @Transactional
     public ApiResponse<List<AppointmentResponse>> generateAppointments(){
-        Faker faker = new Faker();
-        List<Appointment> appointments = null;
+        List<Employee> employees = employeeRepository.findAll();
+        List<Patient> patients = patientRepository.findAll();
+        List<Appointment> appointments = AppointmentMapper.generateFakeAppointments(patients, employees);
 
         appointmentRepository.saveAll(appointments);
 

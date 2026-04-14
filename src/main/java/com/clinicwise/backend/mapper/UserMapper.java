@@ -60,7 +60,7 @@ public class UserMapper {
         user.setLastname(faker.name().lastName());
         user.setEnabled(true);
         user.setAddress(faker.address().fullAddress());
-        user.setDateOfBirth(MapperUtils.randomDate60YearsTo20YearsAgo(faker));
+        user.setDateOfBirth(MapperUtils.randomDate60YearsTo20YearsAgo());
         user.setDocumentId(faker.letterify("???", true) + " " + faker.numerify("##"));
         user.setNationality(faker.country().name());
         user.setPhoneNumber(faker.phoneNumber().phoneNumber());

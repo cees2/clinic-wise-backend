@@ -18,6 +18,4 @@ public class EmployeeRoleProvider extends AbstractProvider<Faker> {
     public EmployeeRole nextEmployeeRole() {
         return ROLES[getFaker().random().nextInt(ROLES.length)];
     }
-
-
 }

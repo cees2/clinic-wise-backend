@@ -1,5 +1,6 @@
 package com.clinicwise.backend.faker;
 
+import com.clinicwise.backend.faker.provider.AppointmentStatusProvider;
 import com.clinicwise.backend.faker.provider.PatientSubscriptionPlanProvider;
 import com.clinicwise.backend.faker.provider.EmployeeRoleProvider;
 import net.datafaker.Faker;
@@ -11,5 +12,9 @@ public class CustomFaker extends Faker {
 
     public EmployeeRoleProvider employeeRole(){
         return getProvider(EmployeeRoleProvider.class, EmployeeRoleProvider::new, this);
+    }
+
+    public AppointmentStatusProvider appointmentStatus(){
+        return getProvider(AppointmentStatusProvider.class, AppointmentStatusProvider::new, this);
     }
 }

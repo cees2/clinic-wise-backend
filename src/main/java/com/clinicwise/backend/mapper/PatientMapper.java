@@ -111,7 +111,7 @@ public class PatientMapper {
             User user = UserMapper.generateFakeUser();
 
             patient.setCreatedAt(LocalDateTime.now());
-            patient.setStartDate(MapperUtils.randomDate7YearsTo1WeekAgo(faker));
+            patient.setStartDate(MapperUtils.randomDate7YearsTo1WeekAgo());
             patient.setUser(user);
             patient.setSubscriptionPlan(faker.patientSubscriptionPlan().nextSubscriptionPlan());
 
