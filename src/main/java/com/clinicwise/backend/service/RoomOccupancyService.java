@@ -24,8 +24,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.antlr.v4.runtime.tree.xpath.XPath.findAll;
-
 @Service
 public class RoomOccupancyService {
     private RoomOccupancyRepository roomOccupancyRepository;
@@ -164,5 +162,19 @@ public class RoomOccupancyService {
                     overlappingRoomOccupancies.getFirst().getEndTime()
             );
         }
+    }
+
+    public ApiResponse<List<RoomOccupancyResponse>> generateRoomOccupancies() {
+        List<Employee> employees = employeeRepository.findAll();
+        List<Room> rooms = roomRepository.findAll();
+        List<RoomOccupancy> roomOccupancies = RoomOccupancyMapper.generateFakeRoomOccupancies(rooms, employees);
+
+        roomOccupancyRepository.saveAll(roomOccupancies);
+
+        return ApiResponse.toResponse(
+                roomOccupancies.stream()
+                        .map(RoomOccupancyMapper::toResponse)
+                        .toList()
+        );
     }
 }

@@ -31,6 +31,21 @@ public class MapperUtils {
         return getRandomDateTime(getRandomDate(start, end));
     }
 
+    public static LocalDateTime randomFutureDate5Days(){
+        LocalDate start = LocalDate.now();
+        LocalDate end = LocalDate.now().plusDays(5);
+
+        return getRandomDateTime(getRandomDate(start, end));
+    }
+
+    public static LocalDateTime randomFutureDate1DayFromDate(LocalDateTime baseDate){
+        LocalDateTime randomDate =  LocalDateTime.of(baseDate.toLocalDate(), baseDate.toLocalTime());
+        int multiplier = faker.number().numberBetween(1, 20);
+        int minutes = multiplier * 30;
+
+        return randomDate.plusMinutes(minutes);
+    }
+
     private static LocalDate getRandomDate(LocalDate start, LocalDate end) {
         Instant startInstant = start.atStartOfDay(ZoneId.systemDefault()).toInstant();
         Instant endInstant = end.atStartOfDay(ZoneId.systemDefault()).toInstant();

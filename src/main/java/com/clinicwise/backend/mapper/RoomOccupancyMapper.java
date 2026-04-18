@@ -6,9 +6,15 @@ import com.clinicwise.backend.dto.response.RoomOccupancyResponse;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.Room;
 import com.clinicwise.backend.entity.RoomOccupancy;
+import com.clinicwise.backend.faker.CustomFaker;
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class RoomOccupancyMapper {
@@ -46,4 +52,29 @@ public class RoomOccupancyMapper {
         );
     }
 
+    public static List<RoomOccupancy> generateFakeRoomOccupancies(List<Room> rooms, List<Employee> employees) {
+        CustomFaker faker = new CustomFaker();
+        List<RoomOccupancy> roomOccupancies = new ArrayList<>();
+
+        for (int i = 0; i < 20; i++) {
+            RoomOccupancy roomOccupancy = new RoomOccupancy();
+
+            int randomRoomIndex = faker.random().nextInt(rooms.size());
+            int randomEmployeeIndex = faker.random().nextInt(employees.size());
+            Room randomRoom = rooms.get(randomRoomIndex);
+            Employee randomEmployee = employees.get(randomEmployeeIndex);
+            LocalDateTime randomStartDate = MapperUtils.randomFutureDate5Days();
+            LocalDateTime randomEndDate = MapperUtils.randomFutureDate1DayFromDate(randomStartDate);
+
+            roomOccupancy.setCreatedAt(LocalDateTime.now());
+            roomOccupancy.setRoom(randomRoom);
+            roomOccupancy.setEmployee(randomEmployee);
+            roomOccupancy.setStartTime(randomStartDate);
+            roomOccupancy.setEndTime(randomEndDate);
+
+            roomOccupancies.add(roomOccupancy);
+        }
+
+        return roomOccupancies;
+    }
 }
