@@ -1,14 +1,20 @@
 package com.clinicwise.backend.mapper;
 
+import com.clinicwise.backend.dto.request.UserRequest;
 import com.clinicwise.backend.dto.response.UserResponse;
 import com.clinicwise.backend.entity.Authority;
+import com.clinicwise.backend.entity.Avatar;
 import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.enums.AuthorityType;
 import com.clinicwise.backend.enums.Gender;
+import com.clinicwise.backend.exceptions.AvatarUploadException;
 import com.clinicwise.backend.faker.CustomFaker;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.sql.Blob;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,6 +33,8 @@ public class UserMapper {
                 .stream()
                 .map(authority -> authority.getAuthority().name())
                 .collect(Collectors.toSet());
+        Avatar avatar = user.getAvatar();
+        Integer avatarId = avatar != null ? avatar.getId() : null;
 
         return new UserResponse(
                 user.getUsername(),
@@ -39,11 +47,12 @@ public class UserMapper {
                 user.getEnabled(),
                 user.getNationality(),
                 user.getPhoneNumber(),
-                authorities
+                authorities,
+                avatarId
         );
     }
 
-    public static User generateFakeUser(){
+    public static User generateFakeUser() {
         CustomFaker faker = new CustomFaker();
         String username = faker.internet().emailAddress();
         Gender gender = genderMap.get(faker.gender().binaryTypes());
@@ -70,4 +79,26 @@ public class UserMapper {
         return user;
     }
 
+    // TODO: Delete previous avatar case
+    public static User updateUserFromRequest(UserRequest userRequest, User userToBeUpdated, MultipartFile avatar) {
+        String firstName = userRequest.firstname();
+        String lastName = userRequest.lastname();
+
+        if (firstName != null) userToBeUpdated.setFirstname(firstName);
+        if (lastName != null) userToBeUpdated.setLastname(lastName);
+
+        try{
+            if (avatar != null) {
+                Avatar newAvatar = new Avatar();
+                newAvatar.setAvatar(avatar.getBytes());
+                newAvatar.setName(avatar.getOriginalFilename());
+                newAvatar.setUser(userToBeUpdated);
+                userToBeUpdated.setAvatar(newAvatar);
+            };
+        }catch(IOException exception){
+            throw new AvatarUploadException(avatar.getOriginalFilename());
+        }
+
+        return userToBeUpdated;
+    }
 }

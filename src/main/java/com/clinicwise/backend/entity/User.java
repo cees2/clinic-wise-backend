@@ -38,6 +38,8 @@ public class User {
     private String documentId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Authority> authorities;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private Avatar avatar;
 
     public Integer getId() {return id;}
 
@@ -134,4 +136,16 @@ public class User {
     public Set<Authority> getAuthorities() {return authorities;}
 
     public void setAuthorities(Set<Authority> authorities) {this.authorities = authorities;}
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public Avatar getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Avatar avatar) {
+        this.avatar = avatar;
+    }
 }

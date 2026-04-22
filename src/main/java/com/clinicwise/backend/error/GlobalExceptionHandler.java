@@ -1,5 +1,6 @@
 package com.clinicwise.backend.error;
 
+import com.clinicwise.backend.exceptions.AvatarUploadException;
 import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
 import com.clinicwise.backend.exceptions.RoomOccupancyOverlapping;
 import com.clinicwise.backend.exceptions.RoomWithNameExists;
@@ -86,5 +87,12 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(ErrorCode.INTERNAL_ERROR, exception.getMessage());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    @ExceptionHandler(AvatarUploadException.class)
+    public ResponseEntity<ApiError> runtimeExceptionHandler(AvatarUploadException exception) {
+        ApiError error = new ApiError(ErrorCode.INTERNAL_ERROR, exception.getMessage());
+
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
     }
 }
