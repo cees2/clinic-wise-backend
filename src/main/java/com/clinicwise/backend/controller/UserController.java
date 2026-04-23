@@ -19,7 +19,7 @@ public class UserController {
 
     @PatchMapping(value = "/me", consumes = "multipart/form-data", produces = "application/json")
     public UserResponse updateUser(@RequestPart("user") UserRequest userRequest,
-                                   @RequestPart("avatar") MultipartFile avatar,
+                                   @RequestPart(name = "avatar", required = false) MultipartFile avatar,
                                    HttpServletRequest request) {
         return userService.updateUser(userRequest, avatar, request);
     }

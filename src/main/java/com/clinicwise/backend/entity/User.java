@@ -38,7 +38,7 @@ public class User {
     private String documentId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Authority> authorities;
-    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private Avatar avatar;
 
     public Integer getId() {return id;}

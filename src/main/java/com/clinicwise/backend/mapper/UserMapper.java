@@ -80,24 +80,13 @@ public class UserMapper {
     }
 
     // TODO: Delete previous avatar case
-    public static User updateUserFromRequest(UserRequest userRequest, User userToBeUpdated, MultipartFile avatar) {
+    public static User updateUserFromRequest(UserRequest userRequest, User userToBeUpdated, Avatar avatar) {
         String firstName = userRequest.firstname();
         String lastName = userRequest.lastname();
 
         if (firstName != null) userToBeUpdated.setFirstname(firstName);
         if (lastName != null) userToBeUpdated.setLastname(lastName);
-
-        try{
-            if (avatar != null) {
-                Avatar newAvatar = new Avatar();
-                newAvatar.setAvatar(avatar.getBytes());
-                newAvatar.setName(avatar.getOriginalFilename());
-                newAvatar.setUser(userToBeUpdated);
-                userToBeUpdated.setAvatar(newAvatar);
-            };
-        }catch(IOException exception){
-            throw new AvatarUploadException(avatar.getOriginalFilename());
-        }
+        if (avatar != null) userToBeUpdated.setAvatar(avatar);
 
         return userToBeUpdated;
     }
