@@ -1,5 +1,7 @@
 package com.clinicwise.backend.controller;
 
+import com.clinicwise.backend.api.enums.DashboardDateRangePreset;
+import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.dto.response.DashboardResponse;
 import com.clinicwise.backend.service.DashboardService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +19,7 @@ public class DashboardController {
     }
 
     @GetMapping
-    public DashboardResponse getDashboardData(@RequestParam(required = true) String filter) {
-        return dashboardService.getDashboardData(filter);
+    public ApiResponse<DashboardResponse> getDashboardData(@RequestParam(name = "date_range_preset") DashboardDateRangePreset dateRangePreset) {
+        return dashboardService.getDashboardData(dateRangePreset);
     }
 }

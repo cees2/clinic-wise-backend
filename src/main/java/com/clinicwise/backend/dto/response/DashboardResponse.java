@@ -4,8 +4,9 @@ import java.util.List;
 
 public record DashboardResponse(
         List<AppointmentResponse> appointments,
+        List<AppointmentResponse> nextFiveAppointments,
         long numberOfAppointments,
-        float workTime,
+        long workTime,
         long completedAppointments,
         long cancelledAppointments
 ) {
