@@ -3,7 +3,7 @@ package com.clinicwise.backend.dto.response;
 import java.util.List;
 
 public record DashboardResponse(
-        List<AppointmentResponse> appointments,
+        List<DashboardChartData> chartData,
         List<AppointmentResponse> nextFiveAppointments,
         long numberOfAppointments,
         long workTime,

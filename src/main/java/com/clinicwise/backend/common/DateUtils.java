@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 
 public class DateUtils {
     public final static String DB_DATE_FORMAT_WITH_TIME = "yyyy-MM-dd HH:mm:ss";
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DB_DATE_FORMAT_WITH_TIME);
+    public final static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 
     public static DateRange parseDateRangePresetToDateRange(DashboardDateRangePreset dateRangePreset){
         LocalDateTime startLocalDateTime = null;

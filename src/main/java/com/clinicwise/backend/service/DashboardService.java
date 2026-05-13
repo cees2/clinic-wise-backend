@@ -24,6 +24,6 @@ public class DashboardService {
         List<Appointment> appointments = appointmentRepository.findAll(DashboardSpecification.appointmentsFromDateRange(dateRangePreset));
         List<Appointment> nextFiveAppointments = appointmentRepository.findTop5ByStartDateAfterOrderByStartDateAsc(LocalDateTime.now());
 
-        return ApiResponse.toResponse(DashboardMapper.toResponse(appointments, nextFiveAppointments));
+        return ApiResponse.toResponse(DashboardMapper.toResponse(appointments, nextFiveAppointments, dateRangePreset));
     }
 }
