@@ -65,7 +65,7 @@ public class AppointmentMapper {
         CustomFaker faker = new CustomFaker();
         List<Appointment> appointments = new ArrayList<>();
 
-        for(int i = 0; i < 20; i++) {
+        for(int i = 0; i < 30; i++) {
             Appointment appointment = new Appointment();
             int randomPatientIndex = faker.random().nextInt(patients.size());
             int randomEmployeeIndex = faker.random().nextInt(employees.size());
@@ -73,13 +73,12 @@ public class AppointmentMapper {
             Employee randomEmployee = employees.get(randomEmployeeIndex);
 
             appointment.setCreatedAt(LocalDateTime.now());
-            appointment.setDuration(faker.random().nextInt(1, 60));
-            appointment.setStartDate(MapperUtils.randomFutureDate60Days());
+            appointment.setDuration(faker.number().numberBetween(2, 12) * 5);
+            appointment.setStartDate(MapperUtils.randomFutureDate5Days());
             appointment.setStatus(faker.appointmentStatus().nextAppointmentStatus());
             appointment.setAdditionalNote(faker.lorem().sentence());
             appointment.setEmployee(randomEmployee);
             appointment.setPatient(randomPatient);
-
 
             appointments.add(appointment);
         }

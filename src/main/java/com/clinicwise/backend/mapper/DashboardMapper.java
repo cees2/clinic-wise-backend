@@ -27,7 +27,7 @@ public class DashboardMapper {
                 .toList();
         long numberOfAppointments = appointmentResponses.size();
         long numberOfCompletedAppointments = appointmentResponses.stream()
-                .filter(appointment -> appointment.status().equals(AppointmentStatus.CANCELLED))
+                .filter(appointment -> appointment.status().equals(AppointmentStatus.COMPLETED))
                 .count();
         long numberOfCancelledAppointments = appointmentResponses.stream()
                 .filter(appointment -> appointment.status().equals(AppointmentStatus.CANCELLED))

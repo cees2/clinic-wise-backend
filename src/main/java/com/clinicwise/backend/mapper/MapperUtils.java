@@ -24,13 +24,6 @@ public class MapperUtils {
         return getRandomDate(start, end);
     }
 
-    public static LocalDateTime randomFutureDate60Days(){
-        LocalDate start = LocalDate.now().plusDays(1);
-        LocalDate end = LocalDate.now().plusDays(60);
-
-        return getRandomDateTime(getRandomDate(start, end));
-    }
-
     public static LocalDateTime randomFutureDate5Days(){
         LocalDate start = LocalDate.now();
         LocalDate end = LocalDate.now().plusDays(5);
