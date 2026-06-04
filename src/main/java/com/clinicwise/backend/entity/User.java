@@ -1,5 +1,6 @@
 package com.clinicwise.backend.entity;
 
+import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.Gender;
 import jakarta.persistence.*;
 
@@ -33,7 +34,8 @@ public class User {
     @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
     @Column(name = "nationality", nullable = false)
-    private String nationality;
+    @Enumerated(EnumType.STRING)
+    private Country nationality;
     @Column(name = "document_id", nullable = false, unique = true)
     private String documentId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
@@ -117,11 +119,11 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getNationality() {
+    public Country getNationality() {
         return nationality;
     }
 
-    public void setNationality(String nationality) {
+    public void setNationality(Country nationality) {
         this.nationality = nationality;
     }
 

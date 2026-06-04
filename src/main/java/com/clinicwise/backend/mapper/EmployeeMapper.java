@@ -9,6 +9,7 @@ import com.clinicwise.backend.entity.Authority;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.enums.AuthorityType;
+import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.EmployeeRole;
 import com.clinicwise.backend.enums.Gender;
 import com.clinicwise.backend.faker.CustomFaker;
@@ -62,7 +63,7 @@ public class EmployeeMapper {
         String lastName = updateEmployeeRequest.lastname();
         Gender gender = updateEmployeeRequest.gender();
         LocalDate dateOfBirth = updateEmployeeRequest.dateOfBirth();
-        String nationality = updateEmployeeRequest.nationality();
+        Country nationality = updateEmployeeRequest.nationality();
         String address = updateEmployeeRequest.address();
         String phoneNumber = updateEmployeeRequest.phoneNumber();
         EmployeeRole role = updateEmployeeRequest.role();
@@ -76,7 +77,7 @@ public class EmployeeMapper {
         if (lastName != null && !lastName.isEmpty()) employeeToBeUpdated.getUser().setLastname(lastName);
         if (gender != null) employeeToBeUpdated.getUser().setGender(gender);
         if (dateOfBirth != null) employeeToBeUpdated.getUser().setDateOfBirth(dateOfBirth);
-        if (nationality != null && !nationality.isEmpty()) employeeToBeUpdated.getUser().setNationality(nationality);
+        if (nationality != null) employeeToBeUpdated.getUser().setNationality(nationality);
         if (address != null && !address.isEmpty()) employeeToBeUpdated.getUser().setAddress(address);
         if (phoneNumber != null && !phoneNumber.isEmpty()) employeeToBeUpdated.getUser().setPhoneNumber(phoneNumber);
         if (role != null) employeeToBeUpdated.setRole(role);

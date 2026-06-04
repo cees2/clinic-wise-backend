@@ -2,6 +2,7 @@ package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.common.list.BaseFilter;
 import com.clinicwise.backend.dto.request.CreateAppointmentRequest;
 import com.clinicwise.backend.dto.request.UpdateAppointmentRequest;
 import com.clinicwise.backend.dto.response.AppointmentResponse;
@@ -14,6 +15,9 @@ import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.service.dto.PatientEmployee;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,14 +38,16 @@ public class AppointmentService {
         this.patientRepository = patientRepository;
     }
 
-    public ListResponse<AppointmentResponse> getAllAppointments() {
-        List<AppointmentResponse> appointments = appointmentRepository.findAll()
-                .stream()
+    public ListResponse<AppointmentResponse> getAllAppointments(BaseFilter baseFilter) {
+        Pageable pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getSize() + 1);
+        Page<Appointment> appointments = appointmentRepository.findAll(pageable);
+        List<AppointmentResponse> appointmentResponses = appointments.stream()
                 .map(AppointmentMapper::toResponse)
+                .limit(baseFilter.getSize())
                 .toList();
-        long count = appointmentRepository.count();
+        boolean hasNext = appointments.getSize() > baseFilter.getSize();
 
-        return ListResponse.toResponse(appointments, count);
+        return ListResponse.toResponse(appointmentResponses, hasNext);
     }
 
     public ApiResponse<AppointmentResponse> getAppointment(int appointmentId) {

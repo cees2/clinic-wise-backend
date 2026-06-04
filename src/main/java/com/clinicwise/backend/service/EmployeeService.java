@@ -2,10 +2,12 @@ package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.common.list.BaseFilter;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
 import com.clinicwise.backend.dto.response.SearchSelect;
+import com.clinicwise.backend.entity.Appointment;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
@@ -14,6 +16,9 @@ import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.UserRepository;
 import com.clinicwise.backend.specification.UserSpecifications;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,12 +36,15 @@ public class EmployeeService {
         this.userRepository = userRepository;
     }
 
-    public ListResponse<EmployeeResponse> getAllEmployees() {
-        List<Employee> employees = employeeRepository.findAll();
-        List<EmployeeResponse> patientsList = employees.stream().map(EmployeeMapper::toResponse).toList();
-        long count = employeeRepository.count();
+    public ListResponse<EmployeeResponse> getAllEmployees(BaseFilter baseFilter) {
+        Pageable pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getSize() + 1);
+        Page<Employee> employees = employeeRepository.findAll(pageable);
+        List<EmployeeResponse> patientsList = employees.stream()
+                .map(EmployeeMapper::toResponse)
+                .toList();
+        boolean hasNext = employees.getSize() > baseFilter.getSize();
 
-        return ListResponse.toResponse(patientsList, count);
+        return ListResponse.toResponse(patientsList, hasNext);
     }
 
     public ApiResponse<EmployeeResponse> getEmployee(int id) {

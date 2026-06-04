@@ -2,6 +2,7 @@ package com.clinicwise.backend.controller;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.common.list.BaseFilter;
 import com.clinicwise.backend.dto.request.CreateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.response.RoomOccupancyResponse;
@@ -22,8 +23,8 @@ public class RoomOccupancyController {
     }
 
     @GetMapping
-    public ListResponse<RoomOccupancyResponse> getAllRoomOccupancies() {
-        return roomOccupancyService.getAllRoomOccupancies();
+    public ListResponse<RoomOccupancyResponse> getAllRoomOccupancies(@ModelAttribute BaseFilter filter) {
+        return roomOccupancyService.getAllRoomOccupancies(filter);
     }
 
     @GetMapping("/{roomOccupancyId}")

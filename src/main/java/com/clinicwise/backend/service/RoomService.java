@@ -2,6 +2,7 @@ package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.common.list.BaseFilter;
 import com.clinicwise.backend.dto.request.CreateRoomRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomRequest;
 import com.clinicwise.backend.dto.response.RoomResponse;
@@ -11,6 +12,9 @@ import com.clinicwise.backend.mapper.RoomMapper;
 import com.clinicwise.backend.repository.RoomRepository;
 import com.clinicwise.backend.specification.RoomSpecifications;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,14 +31,16 @@ public class RoomService {
         this.roomMapper = roomMapper;
     }
 
-    public ListResponse<RoomResponse> getAllRooms() {
-        List<RoomResponse> rooms = roomRepository.findAll()
+    public ListResponse<RoomResponse> getAllRooms(BaseFilter baseFilter) {
+        Pageable pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getSize() + 1);
+        Page<Room> rooms = roomRepository.findAll(pageable);
+        List<RoomResponse> roomResponses = roomRepository.findAll()
                 .stream()
                 .map(RoomMapper::toResponse)
                 .toList();
-        long count = roomRepository.count();
+        boolean hasNext = rooms.getSize() > baseFilter.getSize();
 
-        return ListResponse.toResponse(rooms, count);
+        return ListResponse.toResponse(roomResponses, hasNext);
     }
 
     public ApiResponse<RoomResponse> getRoom(int roomId) {

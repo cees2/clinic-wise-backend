@@ -1,5 +1,6 @@
 package com.clinicwise.backend.dto.request;
 
+import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.EmployeeRole;
 import com.clinicwise.backend.enums.Gender;
 
@@ -11,7 +12,7 @@ public record UpdateEmployeeRequest(
         String lastname,
         Gender gender,
         LocalDate dateOfBirth,
-        String nationality,
+        Country nationality,
         String address,
         String phoneNumber,
         EmployeeRole role,

@@ -6,6 +6,7 @@ import com.clinicwise.backend.entity.Authority;
 import com.clinicwise.backend.entity.Avatar;
 import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.enums.AuthorityType;
+import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.Gender;
 import com.clinicwise.backend.exceptions.AvatarUploadException;
 import com.clinicwise.backend.faker.CustomFaker;
@@ -71,7 +72,7 @@ public class UserMapper {
         user.setAddress(faker.address().fullAddress());
         user.setDateOfBirth(MapperUtils.randomDate60YearsTo20YearsAgo());
         user.setDocumentId(faker.letterify("???", true) + " " + faker.numerify("##"));
-        user.setNationality(faker.country().name());
+        user.setNationality(faker.options().option(Country.class));
         user.setPhoneNumber(faker.phoneNumber().phoneNumber());
         user.setGender(gender);
         user.setAuthorities(Set.of(authority));

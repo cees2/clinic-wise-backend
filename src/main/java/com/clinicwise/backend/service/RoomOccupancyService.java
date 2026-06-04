@@ -2,9 +2,11 @@ package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.common.list.BaseFilter;
 import com.clinicwise.backend.dto.request.CreateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.response.RoomOccupancyResponse;
+import com.clinicwise.backend.entity.Appointment;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.Room;
 import com.clinicwise.backend.entity.RoomOccupancy;
@@ -17,6 +19,9 @@ import com.clinicwise.backend.repository.RoomRepository;
 import com.clinicwise.backend.service.dto.RoomEmployee;
 import com.clinicwise.backend.specification.RoomOccupancySpecification;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,14 +43,15 @@ public class RoomOccupancyService {
         this.employeeRepository = employeeRepository;
     }
 
-    public ListResponse<RoomOccupancyResponse> getAllRoomOccupancies() {
-        List<RoomOccupancyResponse> roomOccupancies = roomOccupancyRepository.findAll()
-                .stream()
+    public ListResponse<RoomOccupancyResponse> getAllRoomOccupancies(BaseFilter baseFilter) {
+        Pageable pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getSize() + 1);
+        Page<RoomOccupancy> appointments = roomOccupancyRepository.findAll(pageable);
+        List<RoomOccupancyResponse> roomOccupancies = appointments.stream()
                 .map(RoomOccupancyMapper::toResponse)
                 .toList();
-        long count = roomOccupancyRepository.count();
+        boolean hasNext = appointments.getSize() > baseFilter.getSize();
 
-        return ListResponse.toResponse(roomOccupancies, count);
+        return ListResponse.toResponse(roomOccupancies, hasNext);
     }
 
     public ApiResponse<RoomOccupancyResponse> getRoomOccupancy(int roomOccupancyId) {

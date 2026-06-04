@@ -1,6 +1,7 @@
 package com.clinicwise.backend.dto.response;
 
 import com.clinicwise.backend.entity.Avatar;
+import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.Gender;
 
 import java.time.LocalDate;
@@ -15,7 +16,7 @@ public record UserResponse(
         LocalDate dateOfBirth,
         String documentId,
         boolean enabled,
-        String nationality,
+        Country nationality,
         String phoneNumber,
         Set<String> authorities,
         Integer avatarId

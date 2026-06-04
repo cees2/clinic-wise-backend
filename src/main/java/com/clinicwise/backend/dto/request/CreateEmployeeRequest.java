@@ -1,5 +1,6 @@
 package com.clinicwise.backend.dto.request;
 
+import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.EmployeeRole;
 import com.clinicwise.backend.enums.Gender;
 import jakarta.validation.constraints.NotBlank;
@@ -19,7 +20,7 @@ public record CreateEmployeeRequest(
         @NotNull
         LocalDate dateOfBirth,
         @NotBlank
-        String nationality,
+        Country nationality,
         @NotBlank
         String address,
         @NotBlank

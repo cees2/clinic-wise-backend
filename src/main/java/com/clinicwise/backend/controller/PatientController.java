@@ -2,6 +2,7 @@ package com.clinicwise.backend.controller;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.common.list.BaseFilter;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
@@ -23,8 +24,8 @@ public class PatientController {
     }
 
     @GetMapping
-    ListResponse<PatientResponse> getAllPatients() {
-        return patientService.getAllPatients();
+    ListResponse<PatientResponse> getAllPatients(@ModelAttribute BaseFilter filter) {
+        return patientService.getAllPatients(filter);
     }
 
     @GetMapping("/{patientId}")

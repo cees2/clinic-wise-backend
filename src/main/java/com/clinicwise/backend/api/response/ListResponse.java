@@ -3,22 +3,22 @@ package com.clinicwise.backend.api.response;
 import java.util.List;
 
 public class ListResponse<T> extends ApiResponse<List<T>> {
-    private long size;
+    private boolean hasNext;
 
-    public ListResponse(List<T> data, long size){
+    public ListResponse(List<T> data, boolean hasNext){
         super(data);
-        this.size = size;
+        this.hasNext = hasNext;
     }
 
-    public long getPage() {
-        return size;
+    public boolean isHasNext() {
+        return hasNext;
     }
 
-    public void setPage(long size) {
-        this.size = size;
+    public void setHasNext(boolean hasNext) {
+        this.hasNext = hasNext;
     }
 
-    public static <U> ListResponse<U> toResponse(List<U> data, long size){
-        return new ListResponse<>(data, size);
+    public static <U> ListResponse<U> toResponse(List<U> data, boolean hasNext){
+        return new ListResponse<>(data, hasNext);
     }
 }

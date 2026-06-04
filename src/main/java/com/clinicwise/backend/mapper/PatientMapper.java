@@ -9,6 +9,7 @@ import com.clinicwise.backend.entity.Authority;
 import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.enums.AuthorityType;
+import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.Gender;
 import com.clinicwise.backend.enums.PatientSubscriptionPlan;
 import com.clinicwise.backend.faker.CustomFaker;
@@ -61,7 +62,7 @@ public class PatientMapper {
         LocalDate dateOfBirth = updatePatientRequest.dateOfBirth();
         String documentId = updatePatientRequest.documentId();
         String address = updatePatientRequest.address();
-        String nationality = updatePatientRequest.nationality();
+        Country nationality = updatePatientRequest.nationality();
         String phoneNumber = updatePatientRequest.phoneNumber();
         LocalDate startDate = updatePatientRequest.startDate();
         PatientSubscriptionPlan patientSubscriptionPlan = updatePatientRequest.patientSubscriptionPlan();

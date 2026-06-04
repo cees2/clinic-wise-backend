@@ -1,5 +1,6 @@
 package com.clinicwise.backend.dto.request;
 
+import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.Gender;
 import com.clinicwise.backend.enums.PatientSubscriptionPlan;
 import jakarta.validation.constraints.NotBlank;
@@ -21,7 +22,7 @@ public record CreatePatientRequest(
         @NotBlank
         String address,
         @NotBlank
-        String nationality,
+        Country nationality,
         @NotBlank
         String phoneNumber,
         @NotNull

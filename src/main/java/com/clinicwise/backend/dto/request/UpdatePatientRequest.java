@@ -1,5 +1,6 @@
 package com.clinicwise.backend.dto.request;
 
+import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.Gender;
 import com.clinicwise.backend.enums.PatientSubscriptionPlan;
 
@@ -12,7 +13,7 @@ public record UpdatePatientRequest(
         LocalDate dateOfBirth,
         String documentId,
         String address,
-        String nationality,
+        Country nationality,
         String phoneNumber,
         LocalDate startDate,
         PatientSubscriptionPlan patientSubscriptionPlan,
