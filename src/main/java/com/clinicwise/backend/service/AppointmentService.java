@@ -2,7 +2,7 @@ package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
-import com.clinicwise.backend.common.list.BaseFilter;
+import com.clinicwise.backend.common.list.filter.AppointmentsFilter;
 import com.clinicwise.backend.dto.request.CreateAppointmentRequest;
 import com.clinicwise.backend.dto.request.UpdateAppointmentRequest;
 import com.clinicwise.backend.dto.response.AppointmentResponse;
@@ -14,6 +14,7 @@ import com.clinicwise.backend.repository.AppointmentRepository;
 import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.service.dto.PatientEmployee;
+import com.clinicwise.backend.specification.AppointmentSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,14 +39,14 @@ public class AppointmentService {
         this.patientRepository = patientRepository;
     }
 
-    public ListResponse<AppointmentResponse> getAllAppointments(BaseFilter baseFilter) {
-        Pageable pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getSize() + 1);
-        Page<Appointment> appointments = appointmentRepository.findAll(pageable);
+    public ListResponse<AppointmentResponse> getAllAppointments(AppointmentsFilter appointmentFilter) {
+        Pageable pageable = PageRequest.of(appointmentFilter.getPage(), appointmentFilter.getSize() + 1);
+        Page<Appointment> appointments = appointmentRepository.findAll(AppointmentSpecification.whereFilter(appointmentFilter), pageable);
         List<AppointmentResponse> appointmentResponses = appointments.stream()
                 .map(AppointmentMapper::toResponse)
-                .limit(baseFilter.getSize())
+                .limit(appointmentFilter.getSize())
                 .toList();
-        boolean hasNext = appointments.getSize() > baseFilter.getSize();
+        boolean hasNext = appointments.getNumberOfElements() == appointmentFilter.getSize() + 1;
 
         return ListResponse.toResponse(appointmentResponses, hasNext);
     }

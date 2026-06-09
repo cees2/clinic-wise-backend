@@ -2,11 +2,10 @@ package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
-import com.clinicwise.backend.common.list.BaseFilter;
+import com.clinicwise.backend.common.list.filter.BaseFilter;
 import com.clinicwise.backend.dto.request.CreateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.response.RoomOccupancyResponse;
-import com.clinicwise.backend.entity.Appointment;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.Room;
 import com.clinicwise.backend.entity.RoomOccupancy;
@@ -49,7 +48,7 @@ public class RoomOccupancyService {
         List<RoomOccupancyResponse> roomOccupancies = appointments.stream()
                 .map(RoomOccupancyMapper::toResponse)
                 .toList();
-        boolean hasNext = appointments.getSize() > baseFilter.getSize();
+        boolean hasNext = appointments.getNumberOfElements() == baseFilter.getSize();
 
         return ListResponse.toResponse(roomOccupancies, hasNext);
     }

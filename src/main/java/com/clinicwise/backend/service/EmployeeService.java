@@ -2,12 +2,11 @@ package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
-import com.clinicwise.backend.common.list.BaseFilter;
+import com.clinicwise.backend.common.list.filter.BaseFilter;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
 import com.clinicwise.backend.dto.response.SearchSelect;
-import com.clinicwise.backend.entity.Appointment;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
@@ -42,7 +41,7 @@ public class EmployeeService {
         List<EmployeeResponse> patientsList = employees.stream()
                 .map(EmployeeMapper::toResponse)
                 .toList();
-        boolean hasNext = employees.getSize() > baseFilter.getSize();
+        boolean hasNext = employees.getNumberOfElements() == baseFilter.getSize();
 
         return ListResponse.toResponse(patientsList, hasNext);
     }

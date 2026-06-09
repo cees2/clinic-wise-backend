@@ -1,8 +1,8 @@
-package com.clinicwise.backend.common.list;
+package com.clinicwise.backend.common.list.filter;
 
 public class BaseFilter {
-    private int size = 20;
-    private int page = 0;
+    private int size;
+    private int page;
     private String sort;
 
     public BaseFilter(int size, int page, String sort) {

@@ -2,13 +2,11 @@ package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
-import com.clinicwise.backend.common.list.BaseFilter;
+import com.clinicwise.backend.common.list.filter.BaseFilter;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
 import com.clinicwise.backend.dto.response.SearchSelect;
-import com.clinicwise.backend.entity.Authority;
-import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
@@ -17,16 +15,13 @@ import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.repository.UserRepository;
 import com.clinicwise.backend.specification.UserSpecifications;
 import jakarta.persistence.EntityNotFoundException;
-import net.datafaker.Faker;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class PatientService {
@@ -43,8 +38,9 @@ public class PatientService {
         Page<Patient> patients = patientRepository.findAll(pageable);
         List<PatientResponse> patientsList = patients.stream()
                 .map(PatientMapper::toResponse)
+                .limit(baseFilter.getSize())
                 .toList();
-        boolean hasNext = patients.getSize() > baseFilter.getSize();
+        boolean hasNext = patients.getNumberOfElements() == baseFilter.getSize();
 
         return ListResponse.toResponse(patientsList, hasNext);
     }

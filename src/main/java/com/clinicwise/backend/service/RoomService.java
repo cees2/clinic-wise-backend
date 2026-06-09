@@ -2,7 +2,7 @@ package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
-import com.clinicwise.backend.common.list.BaseFilter;
+import com.clinicwise.backend.common.list.filter.BaseFilter;
 import com.clinicwise.backend.dto.request.CreateRoomRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomRequest;
 import com.clinicwise.backend.dto.response.RoomResponse;
@@ -38,7 +38,7 @@ public class RoomService {
                 .stream()
                 .map(RoomMapper::toResponse)
                 .toList();
-        boolean hasNext = rooms.getSize() > baseFilter.getSize();
+        boolean hasNext = rooms.getNumberOfElements() == baseFilter.getSize();
 
         return ListResponse.toResponse(roomResponses, hasNext);
     }
