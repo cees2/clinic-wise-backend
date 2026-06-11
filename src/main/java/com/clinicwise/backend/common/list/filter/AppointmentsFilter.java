@@ -38,11 +38,19 @@ public class AppointmentsFilter extends BaseFilter{
         this.additionalNote = additionalNote;
     }
 
+    public void setAdditional_note(String additionalNote) {
+        this.additionalNote = additionalNote;
+    }
+
     public String getStartDate() {
         return startDate;
     }
 
     public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setStart_date(String startDate) {
         this.startDate = startDate;
     }
 }
