@@ -2,7 +2,7 @@ package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
-import com.clinicwise.backend.common.list.filter.BaseFilter;
+import com.clinicwise.backend.common.list.filter.EmployeesFilter;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
@@ -13,6 +13,7 @@ import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
 import com.clinicwise.backend.mapper.EmployeeMapper;
 import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.UserRepository;
+import com.clinicwise.backend.specification.EmployeesSpecification;
 import com.clinicwise.backend.specification.UserSpecifications;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
@@ -35,13 +36,13 @@ public class EmployeeService {
         this.userRepository = userRepository;
     }
 
-    public ListResponse<EmployeeResponse> getAllEmployees(BaseFilter baseFilter) {
-        Pageable pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getSize() + 1);
-        Page<Employee> employees = employeeRepository.findAll(pageable);
+    public ListResponse<EmployeeResponse> getAllEmployees(EmployeesFilter employeeFilter) {
+        Pageable pageable = PageRequest.of(employeeFilter.getPage(), employeeFilter.getSize() + 1);
+        Page<Employee> employees = employeeRepository.findAll(EmployeesSpecification.whereFilter(employeeFilter), pageable);
         List<EmployeeResponse> patientsList = employees.stream()
                 .map(EmployeeMapper::toResponse)
                 .toList();
-        boolean hasNext = employees.getNumberOfElements() == baseFilter.getSize();
+        boolean hasNext = employees.getNumberOfElements() == employeeFilter.getSize();
 
         return ListResponse.toResponse(patientsList, hasNext);
     }
@@ -91,7 +92,7 @@ public class EmployeeService {
         employeeRepository.delete(employeeToBeDeleted);
     }
 
-    public ApiResponse<List<SearchSelect>> getSearchSelect(){
+    public ApiResponse<List<SearchSelect>> getSearchSelect() {
         List<Employee> employees = employeeRepository.findAll();
         List<SearchSelect> employeesSearchSelect = employees.stream()
                 .map(EmployeeMapper::toSearchSelect)

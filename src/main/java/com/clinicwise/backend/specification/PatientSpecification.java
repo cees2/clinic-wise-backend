@@ -5,14 +5,12 @@ import com.clinicwise.backend.common.list.filter.ParsedFilter;
 import com.clinicwise.backend.common.list.filter.PatientsFilter;
 import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.entity.User;
-import com.clinicwise.backend.enums.Gender;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
