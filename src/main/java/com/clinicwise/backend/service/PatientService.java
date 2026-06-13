@@ -3,6 +3,7 @@ package com.clinicwise.backend.service;
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.common.list.filter.BaseFilter;
+import com.clinicwise.backend.common.list.filter.PatientsFilter;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
@@ -13,6 +14,7 @@ import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
 import com.clinicwise.backend.mapper.PatientMapper;
 import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.repository.UserRepository;
+import com.clinicwise.backend.specification.PatientSpecification;
 import com.clinicwise.backend.specification.UserSpecifications;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
@@ -33,14 +35,14 @@ public class PatientService {
         this.userRepository = userRepository;
     }
 
-    public ListResponse<PatientResponse> getAllPatients(BaseFilter baseFilter) {
-        Pageable pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getSize() + 1);
-        Page<Patient> patients = patientRepository.findAll(pageable);
+    public ListResponse<PatientResponse> getAllPatients(PatientsFilter patientsFilter) {
+        Pageable pageable = PageRequest.of(patientsFilter.getPage(), patientsFilter.getSize() + 1);
+        Page<Patient> patients = patientRepository.findAll(PatientSpecification.whereFilter(patientsFilter), pageable);
         List<PatientResponse> patientsList = patients.stream()
                 .map(PatientMapper::toResponse)
-                .limit(baseFilter.getSize())
+                .limit(patientsFilter.getSize())
                 .toList();
-        boolean hasNext = patients.getNumberOfElements() == baseFilter.getSize();
+        boolean hasNext = patients.getNumberOfElements() == patientsFilter.getSize();
 
         return ListResponse.toResponse(patientsList, hasNext);
     }
