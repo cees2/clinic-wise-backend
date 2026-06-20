@@ -3,6 +3,7 @@ package com.clinicwise.backend.service;
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.common.list.filter.EmployeesFilter;
+import com.clinicwise.backend.common.list.sort.SortUtil;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
@@ -19,13 +20,25 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class EmployeeService {
+    private static Map<String, String> sortMap = Map.of(
+            "name", "user.firstname",
+            "lastname", "user.lastname",
+            "gender", "user.gender",
+            "start_date", "startDate",
+            "date_of_birth", "user.dateOfBirth",
+            "nationality", "user.nationality",
+            "role", "role"
+    );
     private EmployeeRepository employeeRepository;
     private EmployeeMapper employeeMapper;
     private UserRepository userRepository;
@@ -37,7 +50,8 @@ public class EmployeeService {
     }
 
     public ListResponse<EmployeeResponse> getAllEmployees(EmployeesFilter employeeFilter) {
-        Pageable pageable = PageRequest.of(employeeFilter.getPage(), employeeFilter.getSize() + 1);
+        Sort sort = SortUtil.parseFromString(employeeFilter.getSort(), sortMap);
+        Pageable pageable = PageRequest.of(employeeFilter.getPage(), employeeFilter.getSize() + 1, sort);
         Page<Employee> employees = employeeRepository.findAll(EmployeesSpecification.whereFilter(employeeFilter), pageable);
         List<EmployeeResponse> patientsList = employees.stream()
                 .map(EmployeeMapper::toResponse)
