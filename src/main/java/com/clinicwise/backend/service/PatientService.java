@@ -4,6 +4,7 @@ import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.common.list.filter.BaseFilter;
 import com.clinicwise.backend.common.list.filter.PatientsFilter;
+import com.clinicwise.backend.common.list.sort.SortUtil;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
@@ -20,13 +21,22 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PatientService {
+    private static final Map<String, String> sortMap = Map.of(
+            "name", "user.firstname",
+            "lastname", "user.lastname",
+            "date_of_birth", "user.dateOfBirth",
+            "gender", "user.gender",
+            "nationality", "user.nationality"
+    );
     private PatientRepository patientRepository;
     private UserRepository userRepository;
 
@@ -36,7 +46,8 @@ public class PatientService {
     }
 
     public ListResponse<PatientResponse> getAllPatients(PatientsFilter patientsFilter) {
-        Pageable pageable = PageRequest.of(patientsFilter.getPage(), patientsFilter.getSize() + 1);
+        Sort sort = SortUtil.parseFromString(patientsFilter.getSort(), sortMap);
+        Pageable pageable = PageRequest.of(patientsFilter.getPage(), patientsFilter.getSize() + 1, sort);
         Page<Patient> patients = patientRepository.findAll(PatientSpecification.whereFilter(patientsFilter), pageable);
         List<PatientResponse> patientsList = patients.stream()
                 .map(PatientMapper::toResponse)
