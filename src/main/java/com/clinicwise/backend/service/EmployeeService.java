@@ -29,7 +29,7 @@ import java.util.Map;
 
 @Service
 public class EmployeeService {
-    private static Map<String, String> sortMap = Map.of(
+    private static final Map<String, String> sortMap = Map.of(
             "name", "user.firstname",
             "lastname", "user.lastname",
             "gender", "user.gender",
