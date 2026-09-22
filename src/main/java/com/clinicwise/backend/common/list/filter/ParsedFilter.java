@@ -1,7 +1,5 @@
 package com.clinicwise.backend.common.list.filter;
 
-import org.springframework.web.servlet.tags.Param;
-
 public record ParsedFilter(FilterCondition condition, String value) {
     public static final String filterValueSeparator = "あ";
     public static final String filterConditionValueSeparator = "い";

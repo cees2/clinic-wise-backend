@@ -24,7 +24,7 @@ public class AppointmentController {
 
     @GetMapping
     public ListResponse<AppointmentResponse> getAllAppointments(@ModelAttribute AppointmentsFilter filter){
-            return appointmentService.getAllAppointments(filter);
+        return appointmentService.getAllAppointments(filter);
     }
 
     @GetMapping("/{appointmentId}")

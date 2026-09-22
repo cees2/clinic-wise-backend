@@ -7,8 +7,8 @@ public class PatientsFilter extends BaseFilter{
     private String gender;
     private String nationality;
 
-    public PatientsFilter(int size, int page, String sort, String name, String surname, String dateOfBirth, String gender, String nationality) {
-        super(size, page, sort);
+    public PatientsFilter(int size, int page, String sort, String search, String name, String surname, String dateOfBirth, String gender, String nationality) {
+        super(size, page, sort, search);
         this.name = name;
         this.surname = surname;
         this.dateOfBirth = dateOfBirth;

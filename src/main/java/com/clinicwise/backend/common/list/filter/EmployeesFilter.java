@@ -8,8 +8,8 @@ public class EmployeesFilter extends BaseFilter {
     private String dateOfBirth;
     private String nationality;
 
-    public EmployeesFilter(int size, int page, String sort, String name, String lastname, String gender, String startDate, String dateOfBirth, String nationality) {
-        super(size, page, sort);
+    public EmployeesFilter(int size, int page, String sort, String name, String search, String lastname, String gender, String startDate, String dateOfBirth, String nationality) {
+        super(size, page, sort, search);
         this.name = name;
         this.lastname = lastname;
         this.gender = gender;

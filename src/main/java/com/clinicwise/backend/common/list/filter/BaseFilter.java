@@ -4,11 +4,13 @@ public class BaseFilter {
     private int size;
     private int page;
     private String sort;
+    private String search;
 
-    public BaseFilter(int size, int page, String sort) {
+    public BaseFilter(int size, int page, String sort, String search) {
         this.size = size;
         this.page = page;
         this.sort = sort;
+        this.search = search;
     }
 
     public int getSize() {
@@ -31,7 +33,9 @@ public class BaseFilter {
         return sort;
     }
 
-    public void setSort(String sort) {
-        this.sort = sort;
-    }
+    public void setSort(String sort) {this.sort = sort;}
+
+    public String getSearch() {return search;}
+
+    public void setSearch(String search) {this.search = search;}
 }

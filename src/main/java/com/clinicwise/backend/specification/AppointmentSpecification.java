@@ -14,11 +14,27 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class AppointmentSpecification {
     public static Specification<Appointment> whereFilter(AppointmentsFilter appointmentsFilter) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            if(appointmentsFilter.getSearch() != null) {
+                String search = appointmentsFilter.getSearch().toUpperCase();
+                Path<String> additionalNote = root.get("additionalNote");
+                Path<String> patientName = root.get("patient").get("user").get("firstname");
+                Path<String> employeeName = root.get("employee").get("user").get("firstname");
+
+                Predicate predicate = cb.or(
+                        cb.like(cb.upper(additionalNote), '%' + search + '%'),
+                        cb.like(cb.upper(patientName), '%' + search + '%'),
+                        cb.like(cb.upper(employeeName), '%' + search + '%')
+                );
+
+                predicates.add(predicate);
+            }
 
             if (appointmentsFilter.getDuration() != null) {
                 Path<String> durationPath = root.get("duration");

@@ -6,8 +6,8 @@ public class AppointmentsFilter extends BaseFilter{
     private String additionalNote;
     private String startDate;
 
-    public AppointmentsFilter(int size, int page, String sort, String duration, String status, String additionalNote, String startDate) {
-        super(size, page, sort);
+    public AppointmentsFilter(int size, int page, String sort, String search, String duration, String status, String additionalNote, String startDate) {
+        super(size, page, sort, search);
         this.duration = duration;
         this.status = status;
         this.additionalNote = additionalNote;
