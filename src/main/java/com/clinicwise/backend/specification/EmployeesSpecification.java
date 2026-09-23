@@ -5,6 +5,7 @@ import com.clinicwise.backend.common.list.filter.FilterCondition;
 import com.clinicwise.backend.common.list.filter.ParsedFilter;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.User;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -20,10 +21,27 @@ public class EmployeesSpecification {
     public static Specification<Employee> whereFilter(EmployeesFilter employeesFilter){
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+            Join<Employee, User> employeeUserJoin = root.join("user");
+            Path<String> firstname = employeeUserJoin.get("firstname");
+            Path<String> lastname = employeeUserJoin.get("lastname");
+
+            if(employeesFilter.getSearch() != null){
+                Expression<String> fullName = cb.concat(cb.concat(firstname, " "), lastname);
+                String pattern = "%" + employeesFilter.getSearch().toUpperCase() + "%";
+                Path<String> username = employeeUserJoin.get("username");
+                Path<String> phoneNumber = employeeUserJoin.get("phoneNumber");
+                Path<String> documentId = employeeUserJoin.get("documentId");
+                Predicate predicate = cb.or(
+                        cb.like(cb.upper(fullName), pattern),
+                        cb.like(cb.upper(username), pattern),
+                        cb.like(cb.upper(phoneNumber), pattern),
+                        cb.like(cb.upper(documentId), pattern)
+                );
+
+                predicates.add(predicate);
+            }
 
             if(employeesFilter.getName() != null){
-                Join<Employee, User> employeeUserJoin = root.join("user");
-                Path<String> firstname = employeeUserJoin.get("firstname");
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(employeesFilter.getName());
                 String filterValue = parsedFilter.value();
                 Predicate predicate = parsedFilter.condition() == FilterCondition.C ?
@@ -34,8 +52,6 @@ public class EmployeesSpecification {
             }
 
             if(employeesFilter.getLastname() != null){
-                Join<Employee, User> employeeUserJoin = root.join("user");
-                Path<String> lastname = employeeUserJoin.get("lastname");
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(employeesFilter.getLastname());
                 String filterValue = parsedFilter.value();
                 Predicate predicate = parsedFilter.condition() == FilterCondition.C ?
@@ -46,7 +62,6 @@ public class EmployeesSpecification {
             }
 
             if(employeesFilter.getGender() != null){
-                Join<Employee, User> employeeUserJoin = root.join("user");
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(employeesFilter.getGender());
                 String[] filterValue = parsedFilter.value().split(ParsedFilter.filterValueSeparator);
                 Predicate predicate = employeeUserJoin.get("gender").in(Arrays.asList(filterValue));
@@ -67,7 +82,6 @@ public class EmployeesSpecification {
             }
 
             if(employeesFilter.getDateOfBirth() != null) {
-                Join<Employee, User> employeeUserJoin = root.join("user");
                 Path<LocalDate> employeeDateOfBirth = employeeUserJoin.get("dateOfBirth");
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(employeesFilter.getDateOfBirth());
                 String startDate = parsedFilter.value();
@@ -82,7 +96,6 @@ public class EmployeesSpecification {
             }
 
             if(employeesFilter.getNationality() != null){
-                Join<Employee, User> employeeUserJoin = root.join("user");
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(employeesFilter.getNationality());
                 String[] parsedNationalities = parsedFilter.value().replace(" ", "_").split(ParsedFilter.filterValueSeparator);
                 Predicate predicate = employeeUserJoin.get("nationality").in(parsedNationalities);

@@ -5,6 +5,7 @@ import com.clinicwise.backend.common.list.filter.ParsedFilter;
 import com.clinicwise.backend.common.list.filter.PatientsFilter;
 import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.entity.User;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -20,10 +21,25 @@ public class PatientSpecification {
     public static Specification<Patient> whereFilter(PatientsFilter patientsFilter) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+            Join<Patient, User> patientUserJoin = root.join("user");
+            Path<String> patientName = patientUserJoin.get("firstname");
+            Path<String> patientLastname = patientUserJoin.get("lsstname");
+
+            if(patientsFilter.getSearch() != null ){
+                String searchUpperCase = patientsFilter.getSurname().toUpperCase();
+                String pattern = "% " + searchUpperCase + "%";
+                Path<String> documentId = patientUserJoin.get("documentId");
+                Expression<String> fullName = cb.concat(cb.concat(patientName, " "), patientLastname);
+                Predicate predicate = cb.or(
+                    cb.like(cb.upper(fullName), pattern),
+                    cb.like(cb.upper(patientLastname), pattern),
+                    cb.like(cb.upper(documentId), pattern)
+                );
+
+                predicates.add(predicate);
+            }
 
             if (patientsFilter.getName() != null) {
-                Join<Patient, User> patientUserJoin = root.join("user");
-                Path<String> patientName = patientUserJoin.get("firstname");
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(patientsFilter.getName());
                 String parsedNameValue = parsedFilter.value();
 
@@ -35,8 +51,6 @@ public class PatientSpecification {
             }
 
             if (patientsFilter.getSurname() != null) {
-                Join<Patient, User> patientUserJoin = root.join("user");
-                Path<String> patientLastname = patientUserJoin.get("lastname");
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(patientsFilter.getSurname());
                 String parsedSurnameValue = parsedFilter.value();
 
@@ -48,7 +62,6 @@ public class PatientSpecification {
             }
 
             if(patientsFilter.getDateOfBirth() != null) {
-                Join<Patient, User> patientUserJoin = root.join("user");
                 Path<LocalDate> patientDateOfBirth = patientUserJoin.get("dateOfBirth");
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(patientsFilter.getDateOfBirth());
                 String startDate = parsedFilter.value();
@@ -63,7 +76,6 @@ public class PatientSpecification {
             }
 
             if(patientsFilter.getGender() != null){
-                Join<Patient, User> patientUserJoin = root.join("user");
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(patientsFilter.getGender());
                 String[] parsedGenderValue = parsedFilter.value().split(ParsedFilter.filterValueSeparator);
                 Predicate predicate = patientUserJoin.get("gender").in(Arrays.asList(parsedGenderValue));
@@ -72,7 +84,6 @@ public class PatientSpecification {
             }
 
             if(patientsFilter.getNationality() != null){
-                Join<Patient, User> patientUserJoin = root.join("user");
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(patientsFilter.getNationality());
                 String[] parsedNationalityValue = parsedFilter.value().replace(" ", "_").split(ParsedFilter.filterValueSeparator);
                 Predicate predicate = patientUserJoin.get("nationality").in(Arrays.asList(parsedNationalityValue));

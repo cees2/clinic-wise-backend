@@ -1,6 +1,6 @@
 package com.clinicwise.backend.common.list.filter;
 
-public class PatientsFilter extends BaseFilter{
+public class PatientsFilter extends BaseFilter {
     private String name;
     private String surname;
     private String dateOfBirth;

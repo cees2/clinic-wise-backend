@@ -1,5 +1,6 @@
 package com.clinicwise.backend.common.list.filter;
 
+// TODO: Make abstract
 public class BaseFilter {
     private int size;
     private int page;
