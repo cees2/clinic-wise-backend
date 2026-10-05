@@ -23,11 +23,13 @@ public class UserService {
     private UserRepository userRepository;
     private JWTService JWTService;
     private AvatarRepository avatarRepository;
+    private UserMapper userMapper;
 
-    public UserService(UserRepository userRepository, JWTService JWTService, AvatarRepository avatarRepository) {
+    public UserService(UserRepository userRepository, JWTService JWTService, AvatarRepository avatarRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.JWTService = JWTService;
         this.avatarRepository = avatarRepository;
+        this.userMapper = userMapper;
     }
 
     // todo: remove previous avatar
@@ -59,8 +61,8 @@ public class UserService {
             avatarRepository.save(newAvatarObject);
         }
 
-        UserMapper.updateUserFromRequest(userRequest, user, newAvatarObject);
+        userMapper.updateUserFromRequest(userRequest, user, newAvatarObject);
 
-        return UserMapper.toResponse(user);
+        return userMapper.toResponse(user);
     }
 }

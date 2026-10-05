@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public record RoomOccupancyResponse(
         Room room,
-        Employee employee,
+        EmployeeResponse employee,
         LocalDateTime startTime,
         LocalDateTime endTime,
         Integer id

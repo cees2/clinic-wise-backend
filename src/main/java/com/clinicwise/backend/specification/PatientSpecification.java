@@ -23,11 +23,11 @@ public class PatientSpecification {
             List<Predicate> predicates = new ArrayList<>();
             Join<Patient, User> patientUserJoin = root.join("user");
             Path<String> patientName = patientUserJoin.get("firstname");
-            Path<String> patientLastname = patientUserJoin.get("lsstname");
+            Path<String> patientLastname = patientUserJoin.get("lastname");
 
             if(patientsFilter.getSearch() != null ){
-                String searchUpperCase = patientsFilter.getSurname().toUpperCase();
-                String pattern = "% " + searchUpperCase + "%";
+                String searchUpperCase = patientsFilter.getSearch().toUpperCase();
+                String pattern = "%" + searchUpperCase + "%";
                 Path<String> documentId = patientUserJoin.get("documentId");
                 Expression<String> fullName = cb.concat(cb.concat(patientName, " "), patientLastname);
                 Predicate predicate = cb.or(

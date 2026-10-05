@@ -3,6 +3,9 @@ package com.clinicwise.backend.mapper;
 import com.clinicwise.backend.dto.request.CreateAppointmentRequest;
 import com.clinicwise.backend.dto.request.UpdateAppointmentRequest;
 import com.clinicwise.backend.dto.response.AppointmentResponse;
+import com.clinicwise.backend.dto.response.EmployeeResponse;
+import com.clinicwise.backend.dto.response.PatientResponse;
+import com.clinicwise.backend.dto.response.PersonalDetailsResponse;
 import com.clinicwise.backend.entity.Appointment;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.Patient;
@@ -11,13 +14,22 @@ import com.clinicwise.backend.faker.CustomFaker;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class AppointmentMapper {
+    private PatientMapper patientMapper;
+    private EmployeeMapper employeeMapper;
+    private MapperUtils mapperUtils;
+
+    public AppointmentMapper(PatientMapper patientMapper, EmployeeMapper employeeMapper, MapperUtils mapperUtils) {
+        this.patientMapper = patientMapper;
+        this.employeeMapper = employeeMapper;
+        this.mapperUtils = mapperUtils;
+    }
+
     public Appointment createAppointmentFromRequest(CreateAppointmentRequest createAppointmentRequest, Patient patient, Employee employee) {
         Appointment appointment = new Appointment();
 
@@ -48,7 +60,10 @@ public class AppointmentMapper {
         return appointment;
     }
 
-    public static AppointmentResponse toResponse(Appointment appointment) {
+    public AppointmentResponse toResponse(Appointment appointment) {
+        PatientResponse patientResponse = patientMapper.toResponse(appointment.getPatient());
+        EmployeeResponse employeeResponse = employeeMapper.toResponse(appointment.getEmployee());
+
         return new AppointmentResponse(
                 appointment.getId(),
                 appointment.getCreatedAt(),
@@ -56,12 +71,12 @@ public class AppointmentMapper {
                 appointment.getStartDate(),
                 appointment.getStatus(),
                 appointment.getAdditionalNote(),
-                appointment.getPatient(),
-                appointment.getEmployee()
+                patientResponse,
+                employeeResponse
         );
     }
 
-    public static List<Appointment> generateFakeAppointments(List<Patient> patients, List<Employee> employees) {
+    public List<Appointment> generateFakeAppointments(List<Patient> patients, List<Employee> employees) {
         CustomFaker faker = new CustomFaker();
         List<Appointment> appointments = new ArrayList<>();
 
@@ -74,7 +89,7 @@ public class AppointmentMapper {
 
             appointment.setCreatedAt(LocalDateTime.now());
             appointment.setDuration(faker.number().numberBetween(2, 12) * 5);
-            appointment.setStartDate(MapperUtils.randomFutureDate5Days());
+            appointment.setStartDate(mapperUtils.randomFutureDate5Days());
             appointment.setStatus(faker.appointmentStatus().nextAppointmentStatus());
             appointment.setAdditionalNote(faker.lorem().sentence());
             appointment.setEmployee(randomEmployee);

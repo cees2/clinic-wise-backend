@@ -5,6 +5,7 @@ import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
 import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.dto.response.UserResponse;
+import com.clinicwise.backend.dto.response.PersonalDetailsResponse;
 import com.clinicwise.backend.entity.Authority;
 import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.entity.User;
@@ -15,16 +16,26 @@ import com.clinicwise.backend.enums.PatientSubscriptionPlan;
 import com.clinicwise.backend.faker.CustomFaker;
 import net.datafaker.Faker;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@Component
 public class PatientMapper {
     private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
 
-    public static Patient createPatientFromRequest(CreatePatientRequest createPatientRequest) {
+    private UserMapper userMapper;
+    private MapperUtils mapperUtils;
+
+    public PatientMapper(UserMapper userMapper, MapperUtils mapperUtils) {
+        this.userMapper = userMapper;
+        this.mapperUtils = mapperUtils;
+    }
+
+    public Patient createPatientFromRequest(CreatePatientRequest createPatientRequest) {
         Patient patient = new Patient();
         patient.setStartDate(createPatientRequest.startDate());
         patient.setCreatedAt(LocalDateTime.now());
@@ -55,7 +66,7 @@ public class PatientMapper {
         return patient;
     }
 
-    public static Patient updatePatientFromRequest(UpdatePatientRequest updatePatientRequest, Patient patientToBeUpdated) {
+    public Patient updatePatientFromRequest(UpdatePatientRequest updatePatientRequest, Patient patientToBeUpdated) {
         String firstname = updatePatientRequest.firstname();
         String lastname = updatePatientRequest.lastname();
         Gender gender = updatePatientRequest.gender();
@@ -86,33 +97,33 @@ public class PatientMapper {
         return patientToBeUpdated;
     }
 
-    public static PatientResponse toResponse(Patient patient) {
-        UserResponse userResponse = UserMapper.toResponse(patient.getUser());
+    public PatientResponse toResponse(Patient patient) {
+        PersonalDetailsResponse personalDetailsResponse = userMapper.toPersonalDetailsResponse(patient.getUser());
 
         return new PatientResponse(
                 patient.getId(),
                 patient.getStartDate(),
                 patient.getSubscriptionPlan(),
-                userResponse
+                personalDetailsResponse
         );
     }
 
-    public static SearchSelect toSearchSelect(Patient patient) {
+    public SearchSelect toSearchSelect(Patient patient) {
         String name = patient.getUser().getFirstname() + " " + patient.getUser().getLastname();
 
         return new SearchSelect(patient.getId(), name);
     }
 
-    public static List<Patient> generateFakePatients() {
+    public List<Patient> generateFakePatients() {
         CustomFaker faker = new CustomFaker();
         List<Patient> patients = new ArrayList<>();
 
         for (int i = 0; i < 20; i++) {
             Patient patient = new Patient();
-            User user = UserMapper.generateFakeUser();
+            User user = userMapper.generateFakeUser();
 
             patient.setCreatedAt(LocalDateTime.now());
-            patient.setStartDate(MapperUtils.randomDate7YearsTo1WeekAgo());
+            patient.setStartDate(mapperUtils.randomDate7YearsTo1WeekAgo());
             patient.setUser(user);
             patient.setSubscriptionPlan(faker.patientSubscriptionPlan().nextSubscriptionPlan());
 

@@ -15,15 +15,17 @@ import java.util.List;
 @Service
 public class DashboardService {
     private AppointmentRepository appointmentRepository;
+    private DashboardMapper dashboardMapper;
 
-    public DashboardService(AppointmentRepository appointmentRepository) {
+    public DashboardService(AppointmentRepository appointmentRepository, DashboardMapper dashboardMapper) {
         this.appointmentRepository = appointmentRepository;
+        this.dashboardMapper = dashboardMapper;
     }
 
     public ApiResponse<DashboardResponse> getDashboardData(DashboardDateRangePreset dateRangePreset) {
         List<Appointment> appointments = appointmentRepository.findAll(DashboardSpecification.appointmentsFromDateRange(dateRangePreset));
         List<Appointment> nextFiveAppointments = appointmentRepository.findTop5ByStartDateAfterOrderByStartDateAsc(LocalDateTime.now());
 
-        return ApiResponse.toResponse(DashboardMapper.toResponse(appointments, nextFiveAppointments, dateRangePreset));
+        return ApiResponse.toResponse(dashboardMapper.toResponse(appointments, nextFiveAppointments, dateRangePreset));
     }
 }

@@ -1,10 +1,7 @@
 package com.clinicwise.backend.dto.response;
 
-import com.clinicwise.backend.entity.Employee;
-import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.enums.AppointmentStatus;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record AppointmentResponse(
@@ -14,7 +11,7 @@ public record AppointmentResponse(
         LocalDateTime startDate,
         AppointmentStatus status,
         String additionalNote,
-        Patient patient,
-        Employee employee
+        PatientResponse patient,
+        EmployeeResponse employee
 ) {
 }

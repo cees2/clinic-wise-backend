@@ -20,11 +20,13 @@ public class AuthService {
     private AuthenticationManager authenticationManager;
     private JWTService JWTService;
     private UserRepository userRepository;
+    private UserMapper userMapper;
 
-    public AuthService(AuthenticationManager authenticationManager, JWTService JWTService, UserRepository userRepository) {
+    public AuthService(AuthenticationManager authenticationManager, JWTService JWTService, UserRepository userRepository, UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
         this.JWTService = JWTService;
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     public LoginResponse login(LoginRequest loginRequest) {
@@ -35,7 +37,7 @@ public class AuthService {
             User user = userRepository.findByUsername(loginRequest.email())
                     .orElseThrow(() -> new UsernameNotFoundException(loginRequest.email()));
             String token = JWTService.generateToken(loginRequest.email());
-            UserResponse userResponse = UserMapper.toResponse(user);
+            UserResponse userResponse = userMapper.toResponse(user);
 
             return new LoginResponse(token, userResponse);
         }
@@ -49,6 +51,6 @@ public class AuthService {
         User user = userRepository.findByUsername(usernameFromToken)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
-        return UserMapper.toResponse(user);
+        return userMapper.toResponse(user);
     }
 }

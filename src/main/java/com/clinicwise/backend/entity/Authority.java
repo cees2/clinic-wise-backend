@@ -9,16 +9,15 @@ import jakarta.persistence.*;
 public class Authority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Integer id;
     @Enumerated(EnumType.STRING)
-    @Column(name = "authority", nullable = false)
+    @Column(nullable = false)
     private AuthorityType authority;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(nullable = false)
     @JsonIgnore
     private User user;
-    @Column(name = "username", nullable = false)
+    @Column(nullable = false)
     private String username;
 
     public Integer getId() {

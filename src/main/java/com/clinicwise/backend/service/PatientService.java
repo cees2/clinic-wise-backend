@@ -39,10 +39,12 @@ public class PatientService {
     );
     private PatientRepository patientRepository;
     private UserRepository userRepository;
+    private PatientMapper patientMapper;
 
-    public PatientService(PatientRepository patientRepository, UserRepository userRepository) {
+    public PatientService(PatientRepository patientRepository, UserRepository userRepository, PatientMapper patientMapper) {
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
+        this.patientMapper = patientMapper;
     }
 
     public ListResponse<PatientResponse> getAllPatients(PatientsFilter patientsFilter) {
@@ -50,7 +52,7 @@ public class PatientService {
         Pageable pageable = PageRequest.of(patientsFilter.getPage(), patientsFilter.getSize() + 1, sort);
         Page<Patient> patients = patientRepository.findAll(PatientSpecification.whereFilter(patientsFilter), pageable);
         List<PatientResponse> patientsList = patients.stream()
-                .map(PatientMapper::toResponse)
+                .map(patientMapper::toResponse)
                 .limit(patientsFilter.getSize())
                 .toList();
         boolean hasNext = patients.getNumberOfElements() == patientsFilter.getSize();
@@ -62,7 +64,7 @@ public class PatientService {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a patient with ID: " + patientId));
 
-        return ApiResponse.toResponse(PatientMapper.toResponse(patient));
+        return ApiResponse.toResponse(patientMapper.toResponse(patient));
     }
 
     @Transactional
@@ -77,9 +79,9 @@ public class PatientService {
                 updatePatientRequest.username()
         );
 
-        PatientMapper.updatePatientFromRequest(updatePatientRequest, patientToBeUpdated);
+        patientMapper.updatePatientFromRequest(updatePatientRequest, patientToBeUpdated);
 
-        return ApiResponse.toResponse(PatientMapper.toResponse(patientToBeUpdated));
+        return ApiResponse.toResponse(patientMapper.toResponse(patientToBeUpdated));
     }
 
     @Transactional
@@ -91,12 +93,12 @@ public class PatientService {
                 createPatientRequest.username()
         );
 
-        Patient patient = PatientMapper.createPatientFromRequest(createPatientRequest);
+        Patient patient = patientMapper.createPatientFromRequest(createPatientRequest);
 
         userRepository.save(patient.getUser());
         patientRepository.save(patient);
 
-        return ApiResponse.toResponse(PatientMapper.toResponse(patient));
+        return ApiResponse.toResponse(patientMapper.toResponse(patient));
     }
 
     @Transactional
@@ -109,20 +111,20 @@ public class PatientService {
 
     @Transactional
     public ApiResponse<List<PatientResponse>> generatePatients() {
-        List<Patient> patients = PatientMapper.generateFakePatients();
+        List<Patient> patients = patientMapper.generateFakePatients();
 
         patientRepository.saveAll(patients);
 
         return ApiResponse.toResponse(patients
                 .stream()
-                .map(PatientMapper::toResponse)
+                .map(patientMapper::toResponse)
                 .toList()
         );
     }
 
     public ApiResponse<List<SearchSelect>> getSearchSelect() {
         List<Patient> employees = patientRepository.findAll();
-        List<SearchSelect> employeesSearchSelect = employees.stream().map(PatientMapper::toSearchSelect).toList();
+        List<SearchSelect> employeesSearchSelect = employees.stream().map(patientMapper::toSearchSelect).toList();
 
         return ApiResponse.toResponse(employeesSearchSelect);
     }

@@ -13,9 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class EmployeesSpecification {
     public static Specification<Employee> whereFilter(EmployeesFilter employeesFilter){

@@ -8,6 +8,6 @@ public record EmployeeResponse(
         Integer id,
         LocalDate startDate,
         EmployeeRole role,
-        UserResponse user
+        PersonalDetailsResponse user
 ) {
 }

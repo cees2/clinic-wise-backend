@@ -8,6 +8,6 @@ public record PatientResponse(
         Integer id,
         LocalDate startDate,
         PatientSubscriptionPlan patientSubscriptionPlan,
-        UserResponse user
+        PersonalDetailsResponse user
 ) {
 }

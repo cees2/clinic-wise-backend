@@ -36,7 +36,7 @@ public class RoomService {
         Page<Room> rooms = roomRepository.findAll(pageable);
         List<RoomResponse> roomResponses = roomRepository.findAll()
                 .stream()
-                .map(RoomMapper::toResponse)
+                .map(roomMapper::toResponse)
                 .toList();
         boolean hasNext = rooms.getNumberOfElements() == baseFilter.getSize();
 
@@ -46,7 +46,7 @@ public class RoomService {
     public ApiResponse<RoomResponse> getRoom(int roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("Could not find a room with ID: " + roomId));
 
-        return ApiResponse.toResponse(RoomMapper.toResponse(room));
+        return ApiResponse.toResponse(roomMapper.toResponse(room));
     }
 
     @Transactional
@@ -56,7 +56,7 @@ public class RoomService {
 
         roomRepository.save(roomToBeCreated);
 
-        return ApiResponse.toResponse(RoomMapper.toResponse(roomToBeCreated));
+        return ApiResponse.toResponse(roomMapper.toResponse(roomToBeCreated));
     }
 
     @Transactional
@@ -67,7 +67,7 @@ public class RoomService {
 
         roomMapper.updateRoomFromRequest(updateRoomRequest, roomToBeUpdated);
 
-        return ApiResponse.toResponse(RoomMapper.toResponse(roomToBeUpdated));
+        return ApiResponse.toResponse(roomMapper.toResponse(roomToBeUpdated));
     }
 
     @Transactional

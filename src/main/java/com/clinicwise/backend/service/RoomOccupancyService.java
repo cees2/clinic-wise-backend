@@ -3,6 +3,7 @@ package com.clinicwise.backend.service;
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
 import com.clinicwise.backend.common.list.filter.BaseFilter;
+import com.clinicwise.backend.common.list.filter.RoomsOccupancyFilter;
 import com.clinicwise.backend.dto.request.CreateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.response.RoomOccupancyResponse;
@@ -42,13 +43,13 @@ public class RoomOccupancyService {
         this.employeeRepository = employeeRepository;
     }
 
-    public ListResponse<RoomOccupancyResponse> getAllRoomOccupancies(BaseFilter baseFilter) {
-        Pageable pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getSize() + 1);
-        Page<RoomOccupancy> appointments = roomOccupancyRepository.findAll(pageable);
+    public ListResponse<RoomOccupancyResponse> getAllRoomOccupancies(RoomsOccupancyFilter roomsOccupancyFilter) {
+        Pageable pageable = PageRequest.of(roomsOccupancyFilter.getPage(), roomsOccupancyFilter.getSize() + 1);
+        Page<RoomOccupancy> appointments = roomOccupancyRepository.findAll(RoomOccupancySpecification.whereFilter(roomsOccupancyFilter), pageable);
         List<RoomOccupancyResponse> roomOccupancies = appointments.stream()
-                .map(RoomOccupancyMapper::toResponse)
+                .map(roomOccupancyMapper::toResponse)
                 .toList();
-        boolean hasNext = appointments.getNumberOfElements() == baseFilter.getSize();
+        boolean hasNext = appointments.getNumberOfElements() == roomsOccupancyFilter.getSize();
 
         return ListResponse.toResponse(roomOccupancies, hasNext);
     }
@@ -57,7 +58,7 @@ public class RoomOccupancyService {
         RoomOccupancy roomOccupancy = roomOccupancyRepository.findById(roomOccupancyId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a room occupancy with ID: " + roomOccupancyId));
 
-        return ApiResponse.toResponse(RoomOccupancyMapper.toResponse(roomOccupancy));
+        return ApiResponse.toResponse(roomOccupancyMapper.toResponse(roomOccupancy));
     }
 
     @Transactional
@@ -79,7 +80,7 @@ public class RoomOccupancyService {
 
         roomOccupancyRepository.save(roomOccupancy);
 
-        return ApiResponse.toResponse(RoomOccupancyMapper.toResponse(roomOccupancy));
+        return ApiResponse.toResponse(roomOccupancyMapper.toResponse(roomOccupancy));
     }
 
     @Transactional
@@ -98,7 +99,7 @@ public class RoomOccupancyService {
 
         roomOccupancyMapper.updateRoomOccupancyFromRequest(updateRoomOccupancyRequest, roomOccupancy, roomEmployee.room(), roomEmployee.employee());
 
-        return ApiResponse.toResponse(RoomOccupancyMapper.toResponse(roomOccupancy));
+        return ApiResponse.toResponse(roomOccupancyMapper.toResponse(roomOccupancy));
     }
 
     @Transactional
@@ -172,13 +173,13 @@ public class RoomOccupancyService {
     public ApiResponse<List<RoomOccupancyResponse>> generateRoomOccupancies() {
         List<Employee> employees = employeeRepository.findAll();
         List<Room> rooms = roomRepository.findAll();
-        List<RoomOccupancy> roomOccupancies = RoomOccupancyMapper.generateFakeRoomOccupancies(rooms, employees);
+        List<RoomOccupancy> roomOccupancies = roomOccupancyMapper.generateFakeRoomOccupancies(rooms, employees);
 
         roomOccupancyRepository.saveAll(roomOccupancies);
 
         return ApiResponse.toResponse(
                 roomOccupancies.stream()
-                        .map(RoomOccupancyMapper::toResponse)
+                        .map(roomOccupancyMapper::toResponse)
                         .toList()
         );
     }

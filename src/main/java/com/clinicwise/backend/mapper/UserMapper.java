@@ -2,6 +2,7 @@ package com.clinicwise.backend.mapper;
 
 import com.clinicwise.backend.dto.request.UserRequest;
 import com.clinicwise.backend.dto.response.UserResponse;
+import com.clinicwise.backend.dto.response.PersonalDetailsResponse;
 import com.clinicwise.backend.entity.Authority;
 import com.clinicwise.backend.entity.Avatar;
 import com.clinicwise.backend.entity.User;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.sql.Blob;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,7 +31,13 @@ public class UserMapper {
     );
     private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
 
-    public static UserResponse toResponse(User user) {
+    private MapperUtils mapperUtils;
+
+    public UserMapper(MapperUtils mapperUtils) {
+        this.mapperUtils = mapperUtils;
+    }
+
+    public UserResponse toResponse(User user) {
         Set<String> authorities = user.getAuthorities()
                 .stream()
                 .map(authority -> authority.getAuthority().name())
@@ -53,7 +61,20 @@ public class UserMapper {
         );
     }
 
-    public static User generateFakeUser() {
+    public PersonalDetailsResponse toPersonalDetailsResponse(User user){
+        return new PersonalDetailsResponse(
+                user.getFirstname(),
+                user.getLastname(),
+                user.getGender(),
+                user.getAddress(),
+                user.getDateOfBirth(),
+                user.getDocumentId(),
+                user.getNationality(),
+                user.getPhoneNumber()
+        );
+    }
+
+    public User generateFakeUser() {
         CustomFaker faker = new CustomFaker();
         String username = faker.internet().emailAddress();
         Gender gender = genderMap.get(faker.gender().binaryTypes());
@@ -70,7 +91,7 @@ public class UserMapper {
         user.setLastname(faker.name().lastName());
         user.setEnabled(true);
         user.setAddress(faker.address().fullAddress());
-        user.setDateOfBirth(MapperUtils.randomDate60YearsTo20YearsAgo());
+        user.setDateOfBirth(mapperUtils.randomDate60YearsTo20YearsAgo());
         user.setDocumentId(faker.letterify("???", true) + " " + faker.numerify("##"));
         user.setNationality(faker.options().option(Country.class));
         user.setPhoneNumber(faker.phoneNumber().phoneNumber());
@@ -81,7 +102,7 @@ public class UserMapper {
     }
 
     // TODO: Delete previous avatar case
-    public static User updateUserFromRequest(UserRequest userRequest, User userToBeUpdated, Avatar avatar) {
+    public User updateUserFromRequest(UserRequest userRequest, User userToBeUpdated, Avatar avatar) {
         String firstName = userRequest.firstname();
         String lastName = userRequest.lastname();
 

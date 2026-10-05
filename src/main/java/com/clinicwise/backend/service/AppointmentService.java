@@ -10,6 +10,7 @@ import com.clinicwise.backend.dto.response.AppointmentResponse;
 import com.clinicwise.backend.entity.Appointment;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.Patient;
+import com.clinicwise.backend.enums.AppointmentStatus;
 import com.clinicwise.backend.mapper.AppointmentMapper;
 import com.clinicwise.backend.repository.AppointmentRepository;
 import com.clinicwise.backend.repository.EmployeeRepository;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,7 +56,7 @@ public class AppointmentService {
         Pageable pageable = PageRequest.of(appointmentFilter.getPage(), appointmentFilter.getSize() + 1, sort);
         Page<Appointment> appointments = appointmentRepository.findAll(AppointmentSpecification.whereFilter(appointmentFilter), pageable);
         List<AppointmentResponse> appointmentResponses = appointments.stream()
-                .map(AppointmentMapper::toResponse)
+                .map(appointmentMapper::toResponse)
                 .limit(appointmentFilter.getSize())
                 .toList();
         boolean hasNext = appointments.getNumberOfElements() == appointmentFilter.getSize() + 1;
@@ -66,7 +68,7 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find an appointment with ID: " + appointmentId));
 
-        return ApiResponse.toResponse(AppointmentMapper.toResponse(appointment));
+        return ApiResponse.toResponse(appointmentMapper.toResponse(appointment));
     }
 
     @Transactional
@@ -79,7 +81,7 @@ public class AppointmentService {
 
         appointmentRepository.save(appointment);
 
-        return ApiResponse.toResponse(AppointmentMapper.toResponse(appointment));
+        return ApiResponse.toResponse(appointmentMapper.toResponse(appointment));
     }
 
     @Transactional
@@ -92,7 +94,7 @@ public class AppointmentService {
 
         appointmentMapper.updateAppointmentFromRequest(updateAppointmentRequest, appointmentToBeUpdated, patientEmployee.employee(), patientEmployee.patient());
 
-        return ApiResponse.toResponse(AppointmentMapper.toResponse(appointmentToBeUpdated));
+        return ApiResponse.toResponse(appointmentMapper.toResponse(appointmentToBeUpdated));
     }
 
     @Transactional
@@ -107,15 +109,30 @@ public class AppointmentService {
     public ApiResponse<List<AppointmentResponse>> generateAppointments(){
         List<Employee> employees = employeeRepository.findAll();
         List<Patient> patients = patientRepository.findAll();
-        List<Appointment> appointments = AppointmentMapper.generateFakeAppointments(patients, employees);
+        List<Appointment> appointments = appointmentMapper.generateFakeAppointments(patients, employees);
 
         appointmentRepository.saveAll(appointments);
 
         return ApiResponse.toResponse(
                 appointments.stream()
-                .map(AppointmentMapper::toResponse)
+                .map(appointmentMapper::toResponse)
                 .toList()
         );
+    }
+
+    @Transactional
+    public ApiResponse<AppointmentResponse> cancelAppointment(int appointmentId) {
+        Appointment appointmentToBeCancelled = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find an appointment with ID: " + appointmentId));
+
+        if(appointmentToBeCancelled.getStatus() != AppointmentStatus.SCHEDULED){
+            throw new IllegalStateException("Appointment with ID: " + appointmentId + " is not in the SCHEDULED status and cannot be cancelled.");
+        }
+
+        appointmentToBeCancelled.setStatus(AppointmentStatus.CANCELLED);
+        AppointmentResponse appointmentResponse = appointmentMapper.toResponse(appointmentToBeCancelled);
+
+        return new ApiResponse<>(appointmentResponse);
     }
 
     private PatientEmployee checkIfPatientAndEmployeeExists(Integer patientId, Integer employeeId) {

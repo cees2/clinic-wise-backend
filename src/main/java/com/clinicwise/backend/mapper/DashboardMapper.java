@@ -8,6 +8,7 @@ import com.clinicwise.backend.dto.response.DashboardResponse;
 import com.clinicwise.backend.entity.Appointment;
 import com.clinicwise.backend.enums.AppointmentStatus;
 import net.datafaker.providers.base.App;
+import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -16,14 +17,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class DashboardMapper {
-    public static DashboardResponse toResponse(List<Appointment> appointments, List<Appointment> nextFiveAppointments, DashboardDateRangePreset dateRangePreset) {
+    private AppointmentMapper appointmentMapper;
+
+    public DashboardMapper(AppointmentMapper appointmentMapper) {
+        this.appointmentMapper = appointmentMapper;
+    }
+
+    public DashboardResponse toResponse(List<Appointment> appointments, List<Appointment> nextFiveAppointments, DashboardDateRangePreset dateRangePreset) {
         List<AppointmentResponse> appointmentResponses = appointments.stream()
-                .map(AppointmentMapper::toResponse)
+                .map(appointmentMapper::toResponse)
                 .toList();
         List<DashboardChartData> chartData = convertAppointmentsToDashboardChartData(appointments, dateRangePreset);
         List<AppointmentResponse> nextFiveAppointmentsResponse = nextFiveAppointments.stream()
-                .map(AppointmentMapper::toResponse)
+                .map(appointmentMapper::toResponse)
                 .toList();
         long numberOfAppointments = appointmentResponses.size();
         long numberOfCompletedAppointments = appointmentResponses.stream()
@@ -38,7 +46,7 @@ public class DashboardMapper {
         return new DashboardResponse(chartData, nextFiveAppointmentsResponse, numberOfAppointments, workTime, numberOfCompletedAppointments, numberOfCancelledAppointments);
     }
 
-    private static List<DashboardChartData> convertAppointmentsToDashboardChartData(List<Appointment> dashboardAppointments, DashboardDateRangePreset dateRangePreset) {
+    private List<DashboardChartData> convertAppointmentsToDashboardChartData(List<Appointment> dashboardAppointments, DashboardDateRangePreset dateRangePreset) {
         List<DashboardChartData> dashboardChartData = new ArrayList<>();
 
         switch (dateRangePreset) {
@@ -83,7 +91,7 @@ public class DashboardMapper {
         return dashboardChartData;
     }
 
-    private static int getNumberOfAppointmentsFromDate(List<Appointment> dashboardAppointments, LocalDate currentDate) {
+    private int getNumberOfAppointmentsFromDate(List<Appointment> dashboardAppointments, LocalDate currentDate) {
         return dashboardAppointments.stream()
                 .filter(appointment -> appointment.getStartDate().toLocalDate().equals(currentDate))
                 .toList()

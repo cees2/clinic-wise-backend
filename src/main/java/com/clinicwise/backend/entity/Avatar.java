@@ -3,7 +3,6 @@ package com.clinicwise.backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-@Table(name = "avatar")
 @Entity
 public class Avatar {
     @Id
@@ -11,7 +10,7 @@ public class Avatar {
     private Integer id;
     @Lob
     private byte[] avatar;
-    @Column(name = "name", nullable = false)
+    @Column(nullable = false)
     private String name;
     @OneToOne
     @JsonIgnore

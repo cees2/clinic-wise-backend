@@ -5,23 +5,19 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "room_occupancy")
 public class RoomOccupancy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Integer id;
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
-    @JoinColumn(name = "room_id", nullable = false)
-    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Room room;
-    @Column(name = "start_time")
     private LocalDateTime startTime;
-    @Column(name = "end_time")
     private LocalDateTime endTime;
-    @JoinColumn(name = "employee_id", nullable = false)
-    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Employee employee;
 
     public Integer getId() {

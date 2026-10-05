@@ -53,7 +53,7 @@ public class EmployeeService {
         Pageable pageable = PageRequest.of(employeeFilter.getPage(), employeeFilter.getSize() + 1, sort);
         Page<Employee> employees = employeeRepository.findAll(EmployeesSpecification.whereFilter(employeeFilter), pageable);
         List<EmployeeResponse> patientsList = employees.stream()
-                .map(EmployeeMapper::toResponse)
+                .map(employeeMapper::toResponse)
                 .toList();
         boolean hasNext = employees.getNumberOfElements() == employeeFilter.getSize();
 
@@ -63,7 +63,7 @@ public class EmployeeService {
     public ApiResponse<EmployeeResponse> getEmployee(int id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Could not find an user with id: " + id));
 
-        return ApiResponse.toResponse(EmployeeMapper.toResponse(employee));
+        return ApiResponse.toResponse(employeeMapper.toResponse(employee));
     }
 
     @Transactional
@@ -78,7 +78,7 @@ public class EmployeeService {
 
         employeeRepository.save(employee);
 
-        return ApiResponse.toResponse(EmployeeMapper.toResponse(employee));
+        return ApiResponse.toResponse(employeeMapper.toResponse(employee));
     }
 
     @Transactional
@@ -92,9 +92,9 @@ public class EmployeeService {
                 updateEmployeeRequest.phoneNumber(),
                 updateEmployeeRequest.username()
         );
-        EmployeeMapper.updateEmployeeFromRequest(updateEmployeeRequest, employeeToBeUpdated);
+        employeeMapper.updateEmployeeFromRequest(updateEmployeeRequest, employeeToBeUpdated);
 
-        return ApiResponse.toResponse(EmployeeMapper.toResponse(employeeToBeUpdated));
+        return ApiResponse.toResponse(employeeMapper.toResponse(employeeToBeUpdated));
     }
 
     @Transactional
@@ -108,7 +108,7 @@ public class EmployeeService {
     public ApiResponse<List<SearchSelect>> getSearchSelect() {
         List<Employee> employees = employeeRepository.findAll();
         List<SearchSelect> employeesSearchSelect = employees.stream()
-                .map(EmployeeMapper::toSearchSelect)
+                .map(employeeMapper::toSearchSelect)
                 .toList();
 
         return ApiResponse.toResponse(employeesSearchSelect);
@@ -128,13 +128,13 @@ public class EmployeeService {
 
     @Transactional
     public ApiResponse<List<EmployeeResponse>> generateEmployees() {
-        List<Employee> employees = EmployeeMapper.generateFakeEmployees();
+        List<Employee> employees = employeeMapper.generateFakeEmployees();
 
         employeeRepository.saveAll(employees);
 
         return ApiResponse.toResponse(employees
                 .stream()
-                .map(EmployeeMapper::toResponse)
+                .map(employeeMapper::toResponse)
                 .toList()
         );
     }

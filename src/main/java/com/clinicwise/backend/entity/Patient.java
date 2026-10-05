@@ -7,23 +7,20 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "patient")
 public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Integer id;
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
-    @Column(name = "start_date", nullable = false)
+    @Column(nullable = false)
     private LocalDate startDate;
     @Enumerated(EnumType.STRING)
-    @Column(name = "subscription_plan", nullable = false)
+    @Column(nullable = false)
     private PatientSubscriptionPlan subscriptionPlan;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "id", nullable = false, unique = true)
     private User user;
-
 
     public Integer getId() {
         return id;

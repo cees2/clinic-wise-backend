@@ -18,6 +18,14 @@ import java.util.List;
 
 @Component
 public class RoomOccupancyMapper {
+    private MapperUtils mapperUtils;
+    private EmployeeMapper employeeMapper;
+
+    public RoomOccupancyMapper(MapperUtils mapperUtils, EmployeeMapper employeeMapper) {
+        this.mapperUtils = mapperUtils;
+        this.employeeMapper = employeeMapper;
+    }
+
     public RoomOccupancy createRoomOccupancyFromRequest(CreateRoomOccupancyRequest createRoomOccupancyRequest, Room room, Employee employee) {
         RoomOccupancy roomOccupancy = new RoomOccupancy();
 
@@ -42,17 +50,17 @@ public class RoomOccupancyMapper {
         return roomOccupancy;
     }
 
-    public static RoomOccupancyResponse toResponse(RoomOccupancy roomOccupancy) {
+    public RoomOccupancyResponse toResponse(RoomOccupancy roomOccupancy) {
         return new RoomOccupancyResponse(
                 roomOccupancy.getRoom(),
-                roomOccupancy.getEmployee(),
+                employeeMapper.toResponse(roomOccupancy.getEmployee()),
                 roomOccupancy.getStartTime(),
                 roomOccupancy.getEndTime(),
                 roomOccupancy.getId()
         );
     }
 
-    public static List<RoomOccupancy> generateFakeRoomOccupancies(List<Room> rooms, List<Employee> employees) {
+    public List<RoomOccupancy> generateFakeRoomOccupancies(List<Room> rooms, List<Employee> employees) {
         CustomFaker faker = new CustomFaker();
         List<RoomOccupancy> roomOccupancies = new ArrayList<>();
 
@@ -63,8 +71,8 @@ public class RoomOccupancyMapper {
             int randomEmployeeIndex = faker.random().nextInt(employees.size());
             Room randomRoom = rooms.get(randomRoomIndex);
             Employee randomEmployee = employees.get(randomEmployeeIndex);
-            LocalDateTime randomStartDate = MapperUtils.randomFutureDate5Days();
-            LocalDateTime randomEndDate = MapperUtils.randomFutureDate1DayFromDate(randomStartDate);
+            LocalDateTime randomStartDate = mapperUtils.randomFutureDate5Days();
+            LocalDateTime randomEndDate = mapperUtils.randomFutureDate1DayFromDate(randomStartDate);
 
             roomOccupancy.setCreatedAt(LocalDateTime.now());
             roomOccupancy.setRoom(randomRoom);

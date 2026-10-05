@@ -2,6 +2,7 @@ package com.clinicwise.backend.entity;
 
 import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -12,31 +13,32 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private Integer id;
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
-    @Column(name = "password", nullable = false)
+    @Column(nullable = false)
+    @JsonIgnore
     private String password;
-    @Column(name = "enabled", nullable = false)
+    @Column(nullable = false)
     private boolean enabled;
-    @Column(name = "firstname", nullable = false)
+    @Column(nullable = false)
     private String firstname;
-    @Column(name = "lastname", nullable = false)
+    @Column(nullable = false)
     private String lastname;
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender", nullable = false)
+    @Column(nullable = false)
     private Gender gender;
-    @Column(name = "date_of_birth", nullable = false)
+    @Column(nullable = false)
     private LocalDate dateOfBirth;
-    @Column(name = "address", nullable = false)
+    @Column(nullable = false)
     private String address;
-    @Column(name = "phone_number", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String phoneNumber;
-    @Column(name = "nationality", nullable = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Country nationality;
-    @Column(name = "document_id", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String documentId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Authority> authorities;

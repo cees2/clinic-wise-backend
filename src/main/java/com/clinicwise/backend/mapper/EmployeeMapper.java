@@ -5,6 +5,7 @@ import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
 import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.dto.response.UserResponse;
+import com.clinicwise.backend.dto.response.PersonalDetailsResponse;
 import com.clinicwise.backend.entity.Authority;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.User;
@@ -24,6 +25,14 @@ import java.util.Set;
 
 @Component
 public class EmployeeMapper {
+    private UserMapper userMapper;
+    private MapperUtils mapperUtils;
+
+    public EmployeeMapper(UserMapper userMapper, MapperUtils mapperUtils) {
+        this.userMapper = userMapper;
+        this.mapperUtils = mapperUtils;
+    }
+
     public Employee createEmployeeFromRequest(CreateEmployeeRequest createEmployeeRequest) {
         Employee employee = new Employee();
         employee.setCreatedAt(LocalDateTime.now());
@@ -49,15 +58,13 @@ public class EmployeeMapper {
         user.setPassword(createEmployeeRequest.password());
 
         authority.setUser(user);
-
         user.setAuthorities(authoritySet);
-
         employee.setUser(user);
 
         return employee;
     }
 
-    public static Employee updateEmployeeFromRequest(UpdateEmployeeRequest updateEmployeeRequest, Employee employeeToBeUpdated) {
+    public Employee updateEmployeeFromRequest(UpdateEmployeeRequest updateEmployeeRequest, Employee employeeToBeUpdated) {
         LocalDate startDate = updateEmployeeRequest.startDate();
         String name = updateEmployeeRequest.firstname();
         String lastName = updateEmployeeRequest.lastname();
@@ -89,33 +96,33 @@ public class EmployeeMapper {
         return employeeToBeUpdated;
     }
 
-    public static EmployeeResponse toResponse(Employee employee) {
-        UserResponse userResponse = UserMapper.toResponse(employee.getUser());
+    public EmployeeResponse toResponse(Employee employee) {
+        PersonalDetailsResponse personalDetailsResponse = userMapper.toPersonalDetailsResponse(employee.getUser());
 
         return new EmployeeResponse(
                 employee.getId(),
                 employee.getStartDate(),
                 employee.getRole(),
-                userResponse
+                personalDetailsResponse
         );
     }
 
-    public static SearchSelect toSearchSelect(Employee employee){
+    public SearchSelect toSearchSelect(Employee employee){
         String name = employee.getUser().getFirstname() + " " + employee.getUser().getLastname();
 
         return new SearchSelect(employee.getId(), name);
     }
 
-    public static List<Employee> generateFakeEmployees() {
+    public List<Employee> generateFakeEmployees() {
         CustomFaker faker = new CustomFaker();
         List<Employee> employees = new ArrayList<>();
 
         for (int i = 0; i < 20; i++) {
             Employee employee = new Employee();
-            User user = UserMapper.generateFakeUser();
+            User user = userMapper.generateFakeUser();
 
             employee.setCreatedAt(LocalDateTime.now());
-            employee.setStartDate(MapperUtils.randomDate7YearsTo1WeekAgo());
+            employee.setStartDate(mapperUtils.randomDate7YearsTo1WeekAgo());
             employee.setUser(user);
             employee.setRole(faker.employeeRole().nextEmployeeRole());
             employees.add(employee);

@@ -26,7 +26,7 @@ public class RoomMapper {
         return room;
     }
 
-    public static RoomResponse toResponse(Room room) {
+    public RoomResponse toResponse(Room room) {
         return new RoomResponse(room.getId(), room.getName());
     }
 }
