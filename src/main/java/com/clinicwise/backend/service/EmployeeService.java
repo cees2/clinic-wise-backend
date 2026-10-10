@@ -52,12 +52,13 @@ public class EmployeeService {
         Sort sort = SortUtil.parseFromString(employeeFilter.getSort(), sortMap);
         Pageable pageable = PageRequest.of(employeeFilter.getPage(), employeeFilter.getSize() + 1, sort);
         Page<Employee> employees = employeeRepository.findAll(EmployeesSpecification.whereFilter(employeeFilter), pageable);
-        List<EmployeeResponse> patientsList = employees.stream()
+        List<EmployeeResponse> employeesList = employees.stream()
+                .limit(employeeFilter.getSize())
                 .map(employeeMapper::toResponse)
                 .toList();
-        boolean hasNext = employees.getNumberOfElements() == employeeFilter.getSize();
+        boolean hasNext = employees.getNumberOfElements() == employeeFilter.getSize() + 1;
 
-        return ListResponse.toResponse(patientsList, hasNext);
+        return ListResponse.toResponse(employeesList, hasNext);
     }
 
     public ApiResponse<EmployeeResponse> getEmployee(int id) {
@@ -121,7 +122,7 @@ public class EmployeeService {
                                 .hasDocumentIDOrPhoneNumberOrUserName(documentId, phoneNumber, username)
                 );
 
-        if (!usersWithSimilarData.isEmpty() && !usersWithSimilarData.getFirst().getId().equals(userId)) {
+        if (!usersWithSimilarData.isEmpty() && usersWithSimilarData.stream().noneMatch(user -> user.getId().equals(userId))) {
             throw new UserWithProvidedDataExists();
         }
     }
