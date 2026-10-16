@@ -78,7 +78,7 @@ public class AppointmentSpecification {
                 LocalDate parsedStartDate = LocalDate.parse(startDate, formatter);
 
                 Predicate predicate = parsedFilter.condition() == FilterCondition.LTE ?
-                        cb.lessThanOrEqualTo(root.get("startDate"), parsedStartDate.atTime(LocalTime.MAX)) :
+                        cb.lessThan(root.get("startDate"), parsedStartDate.plusDays(1).atStartOfDay()) :
                         cb.greaterThanOrEqualTo(root.get("startDate"), parsedStartDate.atStartOfDay());
 
                 predicates.add(predicate);

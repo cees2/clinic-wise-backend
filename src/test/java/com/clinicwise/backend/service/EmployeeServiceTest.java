@@ -98,7 +98,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    @DisplayName("Should not update employee when user with conflicting data exists")
+    @DisplayName("Should not update employee when conflicting data exists")
     void UpdateThrowIfEmployeeWithPhoneNumberExists(){
         String employeePhoneNumber = "999222111";
         Employee existingEmployeeId1 = new Employee();

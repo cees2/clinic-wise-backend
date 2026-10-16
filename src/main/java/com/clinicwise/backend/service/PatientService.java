@@ -2,7 +2,6 @@ package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.ListResponse;
-import com.clinicwise.backend.common.list.filter.BaseFilter;
 import com.clinicwise.backend.common.list.filter.PatientsFilter;
 import com.clinicwise.backend.common.list.sort.SortUtil;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
@@ -55,7 +54,7 @@ public class PatientService {
                 .map(patientMapper::toResponse)
                 .limit(patientsFilter.getSize())
                 .toList();
-        boolean hasNext = patients.getNumberOfElements() == patientsFilter.getSize();
+        boolean hasNext = patients.getNumberOfElements() == patientsFilter.getSize() + 1;
 
         return ListResponse.toResponse(patientsList, hasNext);
     }
@@ -103,10 +102,10 @@ public class PatientService {
 
     @Transactional
     public void deletePatient(int patientId) {
-        Patient patientToBeUpdated = patientRepository.findById(patientId)
+        Patient patientToBeDeleted = patientRepository.findById(patientId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a patient with ID: " + patientId));
 
-        patientRepository.delete(patientToBeUpdated);
+        patientRepository.delete(patientToBeDeleted);
     }
 
     @Transactional
@@ -129,14 +128,14 @@ public class PatientService {
         return ApiResponse.toResponse(employeesSearchSelect);
     }
 
-    private void assertNoDuplicatePatient(Integer patientId, String documentId, String phoneNumber, String username) {
+    private void assertNoDuplicatePatient(Integer patientUserId, String documentId, String phoneNumber, String username) {
         List<User> usersWithSimilarData = userRepository
                 .findAll(
                         UserSpecifications
                                 .hasDocumentIDOrPhoneNumberOrUserName(documentId, phoneNumber, username)
                 );
 
-        if (!usersWithSimilarData.isEmpty() && !usersWithSimilarData.getFirst().getId().equals(patientId)) {
+        if (usersWithSimilarData.stream().anyMatch(user -> !user.getId().equals(patientUserId))) {
             throw new UserWithProvidedDataExists();
         }
     }

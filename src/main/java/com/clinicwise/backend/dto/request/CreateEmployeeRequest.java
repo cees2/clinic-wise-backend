@@ -19,7 +19,7 @@ public record CreateEmployeeRequest(
         Gender gender,
         @NotNull
         LocalDate dateOfBirth,
-        @NotBlank
+        @NotNull
         Country nationality,
         @NotBlank
         String address,

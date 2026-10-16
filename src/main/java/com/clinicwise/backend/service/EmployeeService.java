@@ -122,7 +122,7 @@ public class EmployeeService {
                                 .hasDocumentIDOrPhoneNumberOrUserName(documentId, phoneNumber, username)
                 );
 
-        if (!usersWithSimilarData.isEmpty() && usersWithSimilarData.stream().noneMatch(user -> user.getId().equals(userId))) {
+        if (usersWithSimilarData.stream().anyMatch(user -> !user.getId().equals(userId))) {
             throw new UserWithProvidedDataExists();
         }
     }
