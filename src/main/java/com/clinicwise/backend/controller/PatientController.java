@@ -1,8 +1,9 @@
 package com.clinicwise.backend.controller;
 
 import com.clinicwise.backend.api.response.ApiResponse;
-import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.PatientsFilter;
+import com.clinicwise.backend.common.list.sort.SearchSelectBaseFilter;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
@@ -24,7 +25,7 @@ public class PatientController {
     }
 
     @GetMapping
-    ListResponse<PatientResponse> getAllPatients(@ModelAttribute PatientsFilter filter) {
+    PageResponse<PatientResponse> getAllPatients(@ModelAttribute PatientsFilter filter) {
         return patientService.getAllPatients(filter);
     }
 
@@ -51,8 +52,8 @@ public class PatientController {
     }
 
     @GetMapping("/search_select")
-    public ApiResponse<List<SearchSelect>> getSearchSelect(){
-        return patientService.getSearchSelect();
+    public ApiResponse<PageResponse<SearchSelect>> getSearchSelect(@ModelAttribute SearchSelectBaseFilter searchSelectBaseFilter){
+        return patientService.getSearchSelect(searchSelectBaseFilter);
     }
 
     @PostMapping("/generate")

@@ -1,8 +1,7 @@
 package com.clinicwise.backend.controller;
 
 import com.clinicwise.backend.api.response.ApiResponse;
-import com.clinicwise.backend.api.response.ListResponse;
-import com.clinicwise.backend.common.list.filter.BaseFilter;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.RoomsOccupancyFilter;
 import com.clinicwise.backend.dto.request.CreateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomOccupancyRequest;
@@ -24,7 +23,7 @@ public class RoomOccupancyController {
     }
 
     @GetMapping
-    public ListResponse<RoomOccupancyResponse> getAllRoomOccupancies(@ModelAttribute RoomsOccupancyFilter filter) {
+    public PageResponse<RoomOccupancyResponse> getAllRoomOccupancies(@ModelAttribute RoomsOccupancyFilter filter) {
         return roomOccupancyService.getAllRoomOccupancies(filter);
     }
 

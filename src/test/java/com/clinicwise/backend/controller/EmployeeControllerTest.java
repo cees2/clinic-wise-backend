@@ -1,13 +1,12 @@
 package com.clinicwise.backend.controller;
 
 import com.clinicwise.backend.api.response.ApiResponse;
-import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.config.MyUserDetailsService;
 import com.clinicwise.backend.config.SecurityConfig;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
 import com.clinicwise.backend.dto.response.PersonalDetailsResponse;
-import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.EmployeeRole;
 import com.clinicwise.backend.enums.Gender;
@@ -63,7 +62,7 @@ class EmployeeControllerTest {
                 new EmployeeResponse(2, LocalDate.now(), EmployeeRole.DOCTOR, null),
                 new EmployeeResponse(3, LocalDate.now(), EmployeeRole.DOCTOR, null)
         );
-        when(employeeService.getAllEmployees(any())).thenReturn(ListResponse.toResponse(employees, true));
+        when(employeeService.getAllEmployees(any())).thenReturn(PageResponse.toResponse(employees, true));
 
         mockMvc.perform(
                 get("/employees")

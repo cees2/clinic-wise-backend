@@ -1,6 +1,6 @@
 package com.clinicwise.backend.service;
 
-import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.EmployeesFilter;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
@@ -55,9 +55,9 @@ class EmployeeServiceTest {
         when(employeeRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(getEmployeeList(size + 1)));
 
-        ListResponse<EmployeeResponse> response = employeeService.getAllEmployees(new EmployeesFilter(size, 0, "", "", "", "", "", "", "", ""));
+        PageResponse<EmployeeResponse> response = employeeService.getAllEmployees(new EmployeesFilter(size, 0, "", "", "", "", "", "", "", ""));
 
-        assertTrue(response.isHasNext());
+        assertTrue(response.isHasMore());
         assertEquals(size, response.getData().size());
     }
 
@@ -68,9 +68,9 @@ class EmployeeServiceTest {
         when(employeeRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(getEmployeeList(size)));
 
-        ListResponse<EmployeeResponse> response = employeeService.getAllEmployees(new EmployeesFilter(20, 0, "", "", "", "", "", "", "", ""));
+        PageResponse<EmployeeResponse> response = employeeService.getAllEmployees(new EmployeesFilter(20, 0, "", "", "", "", "", "", "", ""));
 
-        assertFalse(response.isHasNext());
+        assertFalse(response.isHasMore());
         assertEquals(size, response.getData().size());
     }
 

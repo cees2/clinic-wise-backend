@@ -1,7 +1,7 @@
 package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
-import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.AppointmentsFilter;
 import com.clinicwise.backend.common.list.sort.SortUtil;
 import com.clinicwise.backend.dto.request.CreateAppointmentRequest;
@@ -22,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +50,7 @@ public class AppointmentService {
         this.patientRepository = patientRepository;
     }
 
-    public ListResponse<AppointmentResponse> getAllAppointments(AppointmentsFilter appointmentFilter) {
+    public PageResponse<AppointmentResponse> getAllAppointments(AppointmentsFilter appointmentFilter) {
         Sort sort = SortUtil.parseFromString(appointmentFilter.getSort(), sortMap);
         Pageable pageable = PageRequest.of(appointmentFilter.getPage(), appointmentFilter.getSize() + 1, sort);
         Page<Appointment> appointments = appointmentRepository.findAll(AppointmentSpecification.whereFilter(appointmentFilter), pageable);
@@ -61,7 +60,7 @@ public class AppointmentService {
                 .toList();
         boolean hasNext = appointments.getNumberOfElements() == appointmentFilter.getSize() + 1;
 
-        return ListResponse.toResponse(appointmentResponses, hasNext);
+        return PageResponse.toResponse(appointmentResponses, hasNext);
     }
 
     public ApiResponse<AppointmentResponse> getAppointment(int appointmentId) {

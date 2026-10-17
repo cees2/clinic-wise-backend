@@ -1,7 +1,7 @@
 package com.clinicwise.backend.controller;
 
 import com.clinicwise.backend.api.response.ApiResponse;
-import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.AppointmentsFilter;
 import com.clinicwise.backend.dto.request.CreateAppointmentRequest;
 import com.clinicwise.backend.dto.request.UpdateAppointmentRequest;
@@ -23,7 +23,7 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public ListResponse<AppointmentResponse> getAllAppointments(@ModelAttribute AppointmentsFilter filter){
+    public PageResponse<AppointmentResponse> getAllAppointments(@ModelAttribute AppointmentsFilter filter){
         return appointmentService.getAllAppointments(filter);
     }
 

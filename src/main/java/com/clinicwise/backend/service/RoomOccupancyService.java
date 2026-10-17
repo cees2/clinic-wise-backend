@@ -1,8 +1,7 @@
 package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
-import com.clinicwise.backend.api.response.ListResponse;
-import com.clinicwise.backend.common.list.filter.BaseFilter;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.RoomsOccupancyFilter;
 import com.clinicwise.backend.dto.request.CreateRoomOccupancyRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomOccupancyRequest;
@@ -43,7 +42,7 @@ public class RoomOccupancyService {
         this.employeeRepository = employeeRepository;
     }
 
-    public ListResponse<RoomOccupancyResponse> getAllRoomOccupancies(RoomsOccupancyFilter roomsOccupancyFilter) {
+    public PageResponse<RoomOccupancyResponse> getAllRoomOccupancies(RoomsOccupancyFilter roomsOccupancyFilter) {
         Pageable pageable = PageRequest.of(roomsOccupancyFilter.getPage(), roomsOccupancyFilter.getSize() + 1);
         Page<RoomOccupancy> appointments = roomOccupancyRepository.findAll(RoomOccupancySpecification.whereFilter(roomsOccupancyFilter), pageable);
         List<RoomOccupancyResponse> roomOccupancies = appointments.stream()
@@ -51,7 +50,7 @@ public class RoomOccupancyService {
                 .toList();
         boolean hasNext = appointments.getNumberOfElements() == roomsOccupancyFilter.getSize();
 
-        return ListResponse.toResponse(roomOccupancies, hasNext);
+        return PageResponse.toResponse(roomOccupancies, hasNext);
     }
 
     public ApiResponse<RoomOccupancyResponse> getRoomOccupancy(int roomOccupancyId) {

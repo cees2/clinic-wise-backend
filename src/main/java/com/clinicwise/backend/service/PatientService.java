@@ -1,8 +1,9 @@
 package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
-import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.PatientsFilter;
+import com.clinicwise.backend.common.list.sort.SearchSelectBaseFilter;
 import com.clinicwise.backend.common.list.sort.SortUtil;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +48,7 @@ public class PatientService {
         this.patientMapper = patientMapper;
     }
 
-    public ListResponse<PatientResponse> getAllPatients(PatientsFilter patientsFilter) {
+    public PageResponse<PatientResponse> getAllPatients(PatientsFilter patientsFilter) {
         Sort sort = SortUtil.parseFromString(patientsFilter.getSort(), sortMap);
         Pageable pageable = PageRequest.of(patientsFilter.getPage(), patientsFilter.getSize() + 1, sort);
         Page<Patient> patients = patientRepository.findAll(PatientSpecification.whereFilter(patientsFilter), pageable);
@@ -56,7 +58,7 @@ public class PatientService {
                 .toList();
         boolean hasNext = patients.getNumberOfElements() == patientsFilter.getSize() + 1;
 
-        return ListResponse.toResponse(patientsList, hasNext);
+        return PageResponse.toResponse(patientsList, hasNext);
     }
 
     public ApiResponse<PatientResponse> getPatient(int patientId) {
@@ -121,11 +123,14 @@ public class PatientService {
         );
     }
 
-    public ApiResponse<List<SearchSelect>> getSearchSelect() {
-        List<Patient> employees = patientRepository.findAll();
+    public ApiResponse<PageResponse<SearchSelect>> getSearchSelect(SearchSelectBaseFilter searchSelectBaseFilter) {
+        Pageable pageable = PageRequest.of(searchSelectBaseFilter.getPage(), searchSelectBaseFilter.getSize(), Sort.by("user.firstname", "user.lastname"));
+        Page<Patient> employees = patientRepository.findAll(PatientSpecification.searchSelect(searchSelectBaseFilter.getSearch()), pageable);
         List<SearchSelect> employeesSearchSelect = employees.stream().map(patientMapper::toSearchSelect).toList();
+        boolean hasMore = employees.getTotalPages() != searchSelectBaseFilter.getPage();
+        PageResponse<SearchSelect> pageResponse = new PageResponse<>(employeesSearchSelect, hasMore);
 
-        return ApiResponse.toResponse(employeesSearchSelect);
+        return ApiResponse.toResponse(pageResponse);
     }
 
     private void assertNoDuplicatePatient(Integer patientUserId, String documentId, String phoneNumber, String username) {

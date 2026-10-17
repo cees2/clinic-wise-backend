@@ -20,4 +20,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>, Jp
     @Override
     @EntityGraph(attributePaths = "user")
     Optional<Employee> findById(Integer id);
+
+    @Override
+    @EntityGraph(attributePaths = "user")
+    Page<Employee> findAll(Pageable pageable);
 }

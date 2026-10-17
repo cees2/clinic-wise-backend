@@ -1,7 +1,7 @@
 package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
-import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.BaseFilter;
 import com.clinicwise.backend.dto.request.CreateRoomRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomRequest;
@@ -31,7 +31,7 @@ public class RoomService {
         this.roomMapper = roomMapper;
     }
 
-    public ListResponse<RoomResponse> getAllRooms(BaseFilter baseFilter) {
+    public PageResponse<RoomResponse> getAllRooms(BaseFilter baseFilter) {
         Pageable pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getSize() + 1);
         Page<Room> rooms = roomRepository.findAll(pageable);
         List<RoomResponse> roomResponses = roomRepository.findAll()
@@ -40,7 +40,7 @@ public class RoomService {
                 .toList();
         boolean hasNext = rooms.getNumberOfElements() == baseFilter.getSize();
 
-        return ListResponse.toResponse(roomResponses, hasNext);
+        return PageResponse.toResponse(roomResponses, hasNext);
     }
 
     public ApiResponse<RoomResponse> getRoom(int roomId) {

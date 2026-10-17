@@ -1,8 +1,9 @@
 package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
-import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.EmployeesFilter;
+import com.clinicwise.backend.common.list.sort.SearchSelectBaseFilter;
 import com.clinicwise.backend.common.list.sort.SortUtil;
 import com.clinicwise.backend.dto.request.CreateEmployeeRequest;
 import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
@@ -48,7 +49,7 @@ public class EmployeeService {
         this.userRepository = userRepository;
     }
 
-    public ListResponse<EmployeeResponse> getAllEmployees(EmployeesFilter employeeFilter) {
+    public PageResponse<EmployeeResponse> getAllEmployees(EmployeesFilter employeeFilter) {
         Sort sort = SortUtil.parseFromString(employeeFilter.getSort(), sortMap);
         Pageable pageable = PageRequest.of(employeeFilter.getPage(), employeeFilter.getSize() + 1, sort);
         Page<Employee> employees = employeeRepository.findAll(EmployeesSpecification.whereFilter(employeeFilter), pageable);
@@ -58,7 +59,7 @@ public class EmployeeService {
                 .toList();
         boolean hasNext = employees.getNumberOfElements() == employeeFilter.getSize() + 1;
 
-        return ListResponse.toResponse(employeesList, hasNext);
+        return PageResponse.toResponse(employeesList, hasNext);
     }
 
     public ApiResponse<EmployeeResponse> getEmployee(int id) {
@@ -106,13 +107,16 @@ public class EmployeeService {
         employeeRepository.delete(employeeToBeDeleted);
     }
 
-    public ApiResponse<List<SearchSelect>> getSearchSelect() {
-        List<Employee> employees = employeeRepository.findAll();
+    public ApiResponse<PageResponse<SearchSelect>> getSearchSelect(SearchSelectBaseFilter searchSelectBaseFilter) {
+        Pageable pageable = PageRequest.of(searchSelectBaseFilter.getPage(), searchSelectBaseFilter.getSize(), Sort.by("user.firstname", "user.lastname"));
+        Page<Employee> employees = employeeRepository.findAll(EmployeesSpecification.searchSelect(searchSelectBaseFilter.getSearch()), pageable);
         List<SearchSelect> employeesSearchSelect = employees.stream()
                 .map(employeeMapper::toSearchSelect)
                 .toList();
+        boolean hasMore = employees.getTotalPages() != searchSelectBaseFilter.getPage();
+        PageResponse<SearchSelect> pageResponse = new PageResponse<>(employeesSearchSelect, hasMore);
 
-        return ApiResponse.toResponse(employeesSearchSelect);
+        return ApiResponse.toResponse(pageResponse);
     }
 
     private void assertNoDuplicateUser(Integer userId, String documentId, String phoneNumber, String username) {

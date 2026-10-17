@@ -1,7 +1,7 @@
 package com.clinicwise.backend.service;
 
 import com.clinicwise.backend.api.response.ApiResponse;
-import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.AppointmentsFilter;
 import com.clinicwise.backend.dto.request.CreateAppointmentRequest;
 import com.clinicwise.backend.dto.request.UpdateAppointmentRequest;
@@ -157,10 +157,10 @@ class AppointmentServiceTest {
         when(appointmentRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(getMockAppointments(size + 1)));
 
-        ListResponse<AppointmentResponse> response = appointmentService.getAllAppointments(appointmentsFilter);
+        PageResponse<AppointmentResponse> response = appointmentService.getAllAppointments(appointmentsFilter);
 
         assertEquals(size, response.getData().size());
-        assertTrue(response.isHasNext());
+        assertTrue(response.isHasMore());
     }
 
     @Test
@@ -170,10 +170,10 @@ class AppointmentServiceTest {
         when(appointmentRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(getMockAppointments(15)));
 
-        ListResponse<AppointmentResponse> response = appointmentService.getAllAppointments(appointmentsFilter);
+        PageResponse<AppointmentResponse> response = appointmentService.getAllAppointments(appointmentsFilter);
 
         assertEquals(15, response.getData().size());
-        assertFalse(response.isHasNext());
+        assertFalse(response.isHasMore());
     }
 
     private List<Appointment> getMockAppointments(int size){

@@ -1,6 +1,6 @@
 package com.clinicwise.backend.service;
 
-import com.clinicwise.backend.api.response.ListResponse;
+import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.PatientsFilter;
 import com.clinicwise.backend.dto.request.CreatePatientRequest;
 import com.clinicwise.backend.dto.request.UpdatePatientRequest;
@@ -57,10 +57,10 @@ class PatientServiceTest {
         when(patientRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(getPatientList(limit + 1)));
 
         PatientsFilter patientsFilter = new PatientsFilter(limit, 0, null, null, null, null, null, null, null);
-        ListResponse<PatientResponse> response = patientService.getAllPatients(patientsFilter);
+        PageResponse<PatientResponse> response = patientService.getAllPatients(patientsFilter);
 
         assertEquals(limit, response.getData().size());
-        assertTrue(response.isHasNext());
+        assertTrue(response.isHasMore());
     }
 
     @ParameterizedTest
@@ -70,10 +70,10 @@ class PatientServiceTest {
         when(patientRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(getPatientList(limit)));
 
         PatientsFilter patientsFilter = new PatientsFilter(limit, 0, null, null, null, null, null, null, null);
-        ListResponse<PatientResponse> response = patientService.getAllPatients(patientsFilter);
+        PageResponse<PatientResponse> response = patientService.getAllPatients(patientsFilter);
 
         assertEquals(limit, response.getData().size());
-        assertFalse(response.isHasNext());
+        assertFalse(response.isHasMore());
     }
 
     private List<Patient> getPatientList(int limit) {

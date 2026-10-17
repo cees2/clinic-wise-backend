@@ -3,6 +3,7 @@ package com.clinicwise.backend.specification;
 import com.clinicwise.backend.common.list.filter.EmployeesFilter;
 import com.clinicwise.backend.common.list.filter.FilterCondition;
 import com.clinicwise.backend.common.list.filter.ParsedFilter;
+import com.clinicwise.backend.common.list.sort.SearchSelectBaseFilter;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.User;
 import jakarta.persistence.criteria.Expression;
@@ -102,6 +103,20 @@ public class EmployeesSpecification {
             }
 
             return cb.and(predicates);
+        };
+    }
+
+//    TODO: TESTS
+    public static Specification<Employee> searchSelect(String search){
+        return (root, query, criteriaBuilder) -> {
+            if(search == null || search.isEmpty()){
+                return criteriaBuilder.conjunction();
+            }
+
+            Join<Employee, User> employeeUserJoin = root.join("user");
+            Expression<String> fullname = criteriaBuilder.concat(employeeUserJoin.get("firstname"), employeeUserJoin.get("lastname"));
+
+            return criteriaBuilder.like(criteriaBuilder.upper(fullname), "%" + search.toUpperCase() + "%");
         };
     }
 }
