@@ -11,7 +11,7 @@ public class UserBuilder {
     private static final AtomicInteger SEQ = new AtomicInteger();
     private final int n = SEQ.incrementAndGet();
 
-    private Integer id = 0;
+    private Integer id = null;
     private String username = "user" + n;
     private String phoneNumber = "12312" + String.format("%04d", n);
     private String documentId = "AA 11" + n;
@@ -30,6 +30,8 @@ public class UserBuilder {
     public UserBuilder withDocumentID(String documentId) {this.documentId = documentId; return this;}
     public UserBuilder withUsername(String username) {this.username = username; return this;}
     public UserBuilder withGender(Gender gender) {this.gender = gender; return this;}
+    public UserBuilder withDateOfBirth(LocalDate dateOfBirth) {this.dateOfBirth = dateOfBirth; return this;}
+    public UserBuilder withNationality(Country nationality) {this.nationality = nationality; return this;}
 
     public User build(){
         User user = new User();

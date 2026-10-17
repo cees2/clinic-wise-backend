@@ -5,6 +5,8 @@ import com.clinicwise.backend.common.list.filter.ParsedFilter;
 import com.clinicwise.backend.common.list.filter.PatientsFilter;
 import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.entity.User;
+import com.clinicwise.backend.enums.Country;
+import com.clinicwise.backend.enums.Gender;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
@@ -32,7 +34,6 @@ public class PatientSpecification {
                 Expression<String> fullName = cb.concat(cb.concat(patientName, " "), patientLastname);
                 Predicate predicate = cb.or(
                     cb.like(cb.upper(fullName), pattern),
-                    cb.like(cb.upper(patientLastname), pattern),
                     cb.like(cb.upper(documentId), pattern)
                 );
 
@@ -41,22 +42,24 @@ public class PatientSpecification {
 
             if (patientsFilter.getName() != null) {
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(patientsFilter.getName());
-                String parsedNameValue = parsedFilter.value();
+                String parsedNameValue = parsedFilter.value().toUpperCase();
+                Expression<String> patientNameUpperCase = cb.upper(patientName);
 
                 Predicate predicate = parsedFilter.condition() == FilterCondition.C ?
-                        cb.like(patientName, "%" + parsedNameValue + "%") :
-                        cb.equal(patientName, parsedNameValue);
+                        cb.like(patientNameUpperCase, "%" + parsedNameValue + "%") :
+                        cb.equal(patientNameUpperCase, parsedNameValue);
 
                 predicates.add(predicate);
             }
 
             if (patientsFilter.getSurname() != null) {
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(patientsFilter.getSurname());
-                String parsedSurnameValue = parsedFilter.value();
+                String parsedSurnameValue = parsedFilter.value().toUpperCase();
+                Expression<String> patientLastnameUpperCase = cb.upper(patientLastname);
 
                 Predicate predicate = parsedFilter.condition() == FilterCondition.C ?
-                        cb.like(patientLastname, "%" + parsedSurnameValue + "%") :
-                        cb.equal(patientLastname, parsedSurnameValue);
+                        cb.like(patientLastnameUpperCase, "%" + parsedSurnameValue + "%") :
+                        cb.equal(patientLastnameUpperCase, parsedSurnameValue);
 
                 predicates.add(predicate);
             }
@@ -77,16 +80,20 @@ public class PatientSpecification {
 
             if(patientsFilter.getGender() != null){
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(patientsFilter.getGender());
-                String[] parsedGenderValue = parsedFilter.value().split(ParsedFilter.filterValueSeparator);
-                Predicate predicate = patientUserJoin.get("gender").in(Arrays.asList(parsedGenderValue));
+                List<Gender> parsedGenderValue = Arrays.stream(parsedFilter.value().split(ParsedFilter.filterValueSeparator))
+                        .map(gender -> Gender.valueOf(gender.trim().toUpperCase()))
+                        .toList();
+                Predicate predicate = patientUserJoin.get("gender").in(parsedGenderValue);
 
                 predicates.add(predicate);
             }
 
             if(patientsFilter.getNationality() != null){
                 ParsedFilter parsedFilter = ParsedFilter.parseFilter(patientsFilter.getNationality());
-                String[] parsedNationalityValue = parsedFilter.value().replace(" ", "_").split(ParsedFilter.filterValueSeparator);
-                Predicate predicate = patientUserJoin.get("nationality").in(Arrays.asList(parsedNationalityValue));
+                List<Country> parsedNationalityValue = Arrays.stream(parsedFilter.value().split(ParsedFilter.filterValueSeparator))
+                        .map(nationality -> Country.valueOf(nationality.trim().replace(" ", "_").toUpperCase()))
+                        .toList();
+                Predicate predicate = patientUserJoin.get("nationality").in(parsedNationalityValue);
 
                 predicates.add(predicate);
             }

@@ -170,10 +170,10 @@ class PatientServiceTest {
     void createIfNoPatientExists(){
         CreatePatientRequest createPatientRequest = new CreatePatientRequest("Damian", "Mirek", Gender.FEMALE, LocalDate.now(), "", "", Country.FRANCE, "111223332", LocalDate.now(), PatientSubscriptionPlan.BASIC, "", "");
 
+        when(patientMapper.createPatientFromRequest((createPatientRequest))).thenReturn(PatientBuilder.aPatient().withUser(UserBuilder.aUser().build()).build());
         when(userRepository.findAll(any(PredicateSpecification.class))).thenReturn(Collections.emptyList());
 
         assertDoesNotThrow(() -> patientService.createPatient(createPatientRequest));
-
         verify(patientMapper).createPatientFromRequest(createPatientRequest);
         verify(userRepository).save(any());
         verify(patientRepository).save(any());
