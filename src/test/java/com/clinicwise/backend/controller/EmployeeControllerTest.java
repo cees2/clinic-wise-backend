@@ -148,7 +148,7 @@ class EmployeeControllerTest {
         verify(employeeService).createEmployee(createEmployeeRequest);
     }
 
-    static Stream<Arguments> invalidRequests(){
+    private static Stream<Arguments> invalidRequests(){
         return Stream.of(
                 Arguments.of("firstname", "must not be blank", EmployeeRequestBuilder.anEmployeeRequest().withFirstname(null).build()),
                 Arguments.of("firstname", "must not be blank", EmployeeRequestBuilder.anEmployeeRequest().withFirstname("  ").build()),

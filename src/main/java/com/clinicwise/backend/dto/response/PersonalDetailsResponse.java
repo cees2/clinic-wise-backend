@@ -6,6 +6,7 @@ import com.clinicwise.backend.enums.Gender;
 import java.time.LocalDate;
 
 public record PersonalDetailsResponse(
+        String username,
         String firstname,
         String lastname,
         Gender gender,

@@ -10,9 +10,14 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Integer>, JpaSpecificationExecutor<Employee> {
     @Override
     @EntityGraph(attributePaths = "user")
     Page<Employee> findAll(Specification<Employee> spec, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = "user")
+    Optional<Employee> findById(Integer id);
 }

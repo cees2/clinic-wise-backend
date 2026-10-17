@@ -63,6 +63,7 @@ public class UserMapper {
 
     public PersonalDetailsResponse toPersonalDetailsResponse(User user){
         return new PersonalDetailsResponse(
+                user.getUsername(),
                 user.getFirstname(),
                 user.getLastname(),
                 user.getGender(),

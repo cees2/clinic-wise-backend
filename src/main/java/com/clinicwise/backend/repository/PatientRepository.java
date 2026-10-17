@@ -8,8 +8,14 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.Optional;
+
 public interface PatientRepository extends JpaRepository<Patient, Integer>, JpaSpecificationExecutor<Patient> {
     @Override
     @EntityGraph(attributePaths = "user")
     Page<Patient> findAll(Specification<Patient> spec, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = "user")
+    Optional<Patient> findById(Integer id);
 }

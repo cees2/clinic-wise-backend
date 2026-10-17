@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer>, JpaSpecificationExecutor<Appointment> {
     @EntityGraph(attributePaths = {"patient.user", "employee.user"})
@@ -22,4 +23,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     @Override
     @EntityGraph(attributePaths = {"patient.user", "employee.user"})
     List<Appointment> findAll(Specification<Appointment> spec);
+
+    @Override
+    @EntityGraph(attributePaths = {"patient.user", "employee.user"})
+    Optional<Appointment> findById(Integer id);
 }
