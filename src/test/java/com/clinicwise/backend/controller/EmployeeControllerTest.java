@@ -86,7 +86,8 @@ class EmployeeControllerTest {
         String documentId = "AA 001";
         Country nationality = Country.FRANCE;
         String phoneNumber = "123123123";
-        EmployeeResponse employee = new EmployeeResponse(1, startDate, EmployeeRole.DOCTOR, new PersonalDetailsResponse(firstname, lastname, gender, address, dateOfBirth, documentId, nationality, phoneNumber));
+        String username = "test@test.test";
+        EmployeeResponse employee = new EmployeeResponse(1, startDate, EmployeeRole.DOCTOR, new PersonalDetailsResponse(username, firstname, lastname, gender, address, dateOfBirth, documentId, nationality, phoneNumber));
         when(employeeService.getEmployee(1)).thenReturn(ApiResponse.toResponse(employee));
 
         mockMvc.perform(get("/employees/1"))
@@ -121,10 +122,10 @@ class EmployeeControllerTest {
         Country nationality = Country.FRANCE;
         String phoneNumber = "123123123";
         EmployeeRole role = EmployeeRole.DOCTOR;
-        String username = "ddaaqq";
         String password = "testtest";
+        String username = "test@test.test";
         CreateEmployeeRequest createEmployeeRequest = new CreateEmployeeRequest(startDate, firstname, lastname, gender, dateOfBirth, nationality, address, phoneNumber, role, documentId, username, password);
-        EmployeeResponse employee = new EmployeeResponse(1, startDate, role, new PersonalDetailsResponse(firstname, lastname, gender, address, dateOfBirth, documentId, nationality, phoneNumber));
+        EmployeeResponse employee = new EmployeeResponse(1, startDate, role, new PersonalDetailsResponse(username, firstname, lastname, gender, address, dateOfBirth, documentId, nationality, phoneNumber));
         when(employeeService.createEmployee(createEmployeeRequest)).thenReturn(ApiResponse.toResponse(employee));
 
         mockMvc.perform(post("/employees")
