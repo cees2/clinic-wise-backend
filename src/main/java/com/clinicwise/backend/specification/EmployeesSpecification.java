@@ -106,15 +106,14 @@ public class EmployeesSpecification {
         };
     }
 
-//    TODO: TESTS
     public static Specification<Employee> searchSelect(String search){
         return (root, query, criteriaBuilder) -> {
-            if(search == null || search.isEmpty()){
+            if(search == null || search.isBlank()){
                 return criteriaBuilder.conjunction();
             }
 
             Join<Employee, User> employeeUserJoin = root.join("user");
-            Expression<String> fullname = criteriaBuilder.concat(employeeUserJoin.get("firstname"), employeeUserJoin.get("lastname"));
+            Expression<String> fullname = criteriaBuilder.concat(criteriaBuilder.concat(employeeUserJoin.get("firstname"), " "), employeeUserJoin.get("lastname"));
 
             return criteriaBuilder.like(criteriaBuilder.upper(fullname), "%" + search.toUpperCase() + "%");
         };

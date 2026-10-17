@@ -11,6 +11,9 @@ import com.clinicwise.backend.testdata.EmployeeBuilder;
 import com.clinicwise.backend.testdata.UserBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
@@ -265,5 +268,38 @@ class EmployeesSpecificationTest {
 
         assertEquals(2, employeeList.size());
         assertTrue(employeeIds.containsAll(List.of(matchingEmployee0.getId(), matchingEmployee1.getId())));
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"  "})
+    @DisplayName("Should return all of the employees in search select if search is empty")
+    void returnSearchSelectEmptySearch(String search){
+        Employee employee1 = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().withFirstname("Damian").withLastname("Mirek").build()).build());
+        Employee employee2 = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().withFirstname("Mark").withLastname("Smith").build()).build());
+        Employee employee3 = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().withFirstname("John").withLastname("Brown").build()).build());
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        List<Employee> employees = employeeRepository.findAll(EmployeesSpecification.searchSelect(search));
+
+        assertEquals(3, employees.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"damian", "Damian", "Damian M", "damian m", "Damian m", "mirek", "Mirek", "mir"})
+    @DisplayName("Should return filtered out search select employees")
+    void returnSearchSelectNonEmptySearch(String search){
+        Employee employeeToMatch1 = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().withFirstname("Damian").withLastname("Mirek").build()).build());
+        Employee employeeToMatch2 = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().withFirstname("damian").withLastname("mirek").build()).build());
+        Employee employeeNotToMatch = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().withFirstname("John").withLastname("Brown").build()).build());
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        List<Employee> employees = employeeRepository.findAll(EmployeesSpecification.searchSelect(search));
+        List<Integer> employeeIds = employees.stream().map(Employee::getId).toList();
+
+        assertEquals(2, employeeIds.size());
+        assertTrue(employeeIds.containsAll(List.of(employeeToMatch1.getId(), employeeToMatch2.getId())));
     }
 }

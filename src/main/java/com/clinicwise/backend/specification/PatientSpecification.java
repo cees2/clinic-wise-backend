@@ -102,15 +102,14 @@ public class PatientSpecification {
         };
     }
 
-    //    TODO: TESTS
     public static Specification<Patient> searchSelect(String search) {
         return (root, query, criteriaBuilder) -> {
-            if(search == null || search.isEmpty()){
+            if(search == null || search.isBlank()){
                 return criteriaBuilder.conjunction();
             }
 
             Join<Patient, User> patientUserJoin = root.join("user");
-            Expression<String> fullname = criteriaBuilder.concat(patientUserJoin.get("firstname"), patientUserJoin.get("lastname"));
+            Expression<String> fullname = criteriaBuilder.concat(criteriaBuilder.concat(patientUserJoin.get("firstname"), " "), patientUserJoin.get("lastname"));
 
             return criteriaBuilder.like(criteriaBuilder.upper(fullname), "%" + search.toUpperCase() + "%");
         };

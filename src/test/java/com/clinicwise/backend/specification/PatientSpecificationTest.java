@@ -11,6 +11,9 @@ import com.clinicwise.backend.testdata.PatientBuilder;
 import com.clinicwise.backend.testdata.UserBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
@@ -243,5 +246,38 @@ public class PatientSpecificationTest {
 
         assertEquals(2, patientIds.size());
         assertTrue(patientIds.containsAll(List.of(polishPatient.getId(), germanPatient.getId())));
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"  "})
+    @DisplayName("Should return all of the patients in search select if search is empty")
+    void returnSearchSelectEmptySearch(String search){
+        Patient patient1 = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().withFirstname("Damian").withLastname("Mirek").build()).build());
+        Patient patient2 = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().withFirstname("Mark").withLastname("Smith").build()).build());
+        Patient patient3 = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().withFirstname("John").withLastname("Brown").build()).build());
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        List<Patient> patients = patientRepository.findAll(PatientSpecification.searchSelect(search));
+
+        assertEquals(3, patients.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"damian", "Damian", "Damian M", "damian m", "Damian m", "mirek", "Mirek", "mir"})
+    @DisplayName("Should return filtered out search select patients")
+    void returnSearchSelectNonEmptySearch(String search){
+        Patient patientToMatch1 = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().withFirstname("Damian").withLastname("Mirek").build()).build());
+        Patient patientToMatch2 = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().withFirstname("damian").withLastname("mirek").build()).build());
+        Patient patientNotToMatch = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().withFirstname("John").withLastname("Brown").build()).build());
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        List<Patient> patients = patientRepository.findAll(PatientSpecification.searchSelect(search));
+        List<Integer> patientIds = patients.stream().map(Patient::getId).toList();
+
+        assertEquals(2, patientIds.size());
+        assertTrue(patientIds.containsAll(List.of(patientToMatch1.getId(), patientToMatch2.getId())));
     }
 }
