@@ -22,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +48,7 @@ public class PatientService {
     }
 
     public PageResponse<PatientResponse> getAllPatients(PatientsFilter patientsFilter) {
-        Sort sort = SortUtil.parseFromString(patientsFilter.getSort(), sortMap);
+        Sort sort = SortUtil.parseFromString(patientsFilter.getSort(), sortMap, Sort.by(Sort.Order.asc("user.firstname")));
         Pageable pageable = PageRequest.of(patientsFilter.getPage(), patientsFilter.getSize() + 1, sort);
         Page<Patient> patients = patientRepository.findAll(PatientSpecification.whereFilter(patientsFilter), pageable);
         List<PatientResponse> patientsList = patients.stream()

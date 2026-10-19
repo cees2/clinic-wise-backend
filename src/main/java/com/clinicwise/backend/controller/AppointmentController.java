@@ -58,4 +58,9 @@ public class AppointmentController {
     public ApiResponse<AppointmentResponse> cancelAppointment(@PathVariable int appointmentId){
         return appointmentService.cancelAppointment(appointmentId);
     }
+
+    @PatchMapping("/{appointmentId}/schedule")
+    public ApiResponse<AppointmentResponse>scheduleAppointment(@PathVariable int appointmentId){
+        return appointmentService.scheduleAppointment(appointmentId);
+    }
 }

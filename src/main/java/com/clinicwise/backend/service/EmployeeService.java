@@ -50,7 +50,7 @@ public class EmployeeService {
     }
 
     public PageResponse<EmployeeResponse> getAllEmployees(EmployeesFilter employeeFilter) {
-        Sort sort = SortUtil.parseFromString(employeeFilter.getSort(), sortMap);
+        Sort sort = SortUtil.parseFromString(employeeFilter.getSort(), sortMap,Sort.by(Sort.Order.desc("startDate")));
         Pageable pageable = PageRequest.of(employeeFilter.getPage(), employeeFilter.getSize() + 1, sort);
         Page<Employee> employees = employeeRepository.findAll(EmployeesSpecification.whereFilter(employeeFilter), pageable);
         List<EmployeeResponse> employeesList = employees.stream()

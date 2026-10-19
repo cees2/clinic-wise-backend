@@ -25,6 +25,7 @@ public class AppointmentBuilder {
     public AppointmentBuilder withAdditionalNote(String additionalNote){this.additionalNote = additionalNote; return this;}
     public AppointmentBuilder withEmployee(Employee employee){this.employee = employee; return this;}
     public AppointmentBuilder withPatient(Patient patient){this.patient = patient; return this;}
+    public AppointmentBuilder withStatus(AppointmentStatus appointmentStatus) {this.appointmentStatus = appointmentStatus; return this;}
 
     public Appointment build(){
         Appointment appointment = new Appointment();

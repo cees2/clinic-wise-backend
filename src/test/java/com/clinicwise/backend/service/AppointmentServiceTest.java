@@ -13,6 +13,7 @@ import com.clinicwise.backend.mapper.AppointmentMapper;
 import com.clinicwise.backend.repository.AppointmentRepository;
 import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.PatientRepository;
+import com.clinicwise.backend.testdata.AppointmentBuilder;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
+import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -71,6 +73,40 @@ class AppointmentServiceTest {
 
         assertThrows(IllegalStateException.class, () -> appointmentService.cancelAppointment(1));
         assertEquals(status, appointmentCancelled.getStatus());
+    }
+
+    @Test
+    @DisplayName("Should schedule an appointment if the status is set to CANCELLED and the start date is not the future date")
+    void scheduleAppointment(){
+        Appointment appointmentToBeScheduled = AppointmentBuilder.anAppointment().withStartDate(LocalDateTime.now().plusDays(1)).withStatus(AppointmentStatus.CANCELLED).build();
+
+        when(appointmentRepository.findById(1)).thenReturn(Optional.of(appointmentToBeScheduled));
+        when(appointmentMapper.toResponse(appointmentToBeScheduled)).thenReturn(mock(AppointmentResponse.class));
+
+        ApiResponse<AppointmentResponse> response = appointmentService.scheduleAppointment(1);
+
+        assertEquals(AppointmentStatus.SCHEDULED, appointmentToBeScheduled.getStatus());
+    }
+
+    @DisplayName("Should not let schedule any appointment with a status different than CANCELLED")
+    @ParameterizedTest
+    @EnumSource(value = AppointmentStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "CANCELLED")
+    void shouldThrowBasedOnTheStatus(AppointmentStatus appointmentStatus){
+        Appointment appointmentNotToBeScheduled = AppointmentBuilder.anAppointment().withStatus(appointmentStatus).build();
+
+        when(appointmentRepository.findById(1)).thenReturn(Optional.of(appointmentNotToBeScheduled));
+
+        assertThrows(IllegalStateException.class, () -> appointmentService.scheduleAppointment(1));
+    }
+
+    @DisplayName("Should not let schedule an appointment with the past start date")
+    @Test
+    void shouldThrowBasedOnThePastStartDate(){
+        Appointment appointmentNotToBeScheduled = AppointmentBuilder.anAppointment().withStatus(AppointmentStatus.CANCELLED).withStartDate(LocalDateTime.now().minusDays(1)).build();
+
+        when(appointmentRepository.findById(1)).thenReturn(Optional.of(appointmentNotToBeScheduled));
+
+        assertThrows(IllegalStateException.class, () -> appointmentService.scheduleAppointment(1)).getMessage().contains("expired");
     }
 
     @Test

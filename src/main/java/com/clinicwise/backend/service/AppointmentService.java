@@ -25,6 +25,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,7 +53,7 @@ public class AppointmentService {
     }
 
     public PageResponse<AppointmentResponse> getAllAppointments(AppointmentsFilter appointmentFilter) {
-        Sort sort = SortUtil.parseFromString(appointmentFilter.getSort(), sortMap);
+        Sort sort = SortUtil.parseFromString(appointmentFilter.getSort(), sortMap, Sort.by(Sort.Order.desc("startDate")));
         Pageable pageable = PageRequest.of(appointmentFilter.getPage(), appointmentFilter.getSize() + 1, sort);
         Page<Appointment> appointments = appointmentRepository.findAll(AppointmentSpecification.whereFilter(appointmentFilter), pageable);
         List<AppointmentResponse> appointmentResponses = appointments.stream()
@@ -145,5 +147,22 @@ public class AppointmentService {
                 .orElse(null);
 
         return new PatientEmployee(patient, employee);
+    }
+
+    @Transactional
+    public ApiResponse<AppointmentResponse> scheduleAppointment(int appointmentId) {
+        Appointment appointmentToBeScheduled = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find an appointment with ID: " + appointmentId));
+
+        if(appointmentToBeScheduled.getStatus() != AppointmentStatus.CANCELLED){
+            throw new IllegalStateException("Appointment with ID: " + appointmentId + " is not in the CANCELLED status and cannot be scheduled.");
+        }
+        if(appointmentToBeScheduled.getStartDate().isBefore(LocalDateTime.now())){
+            throw new IllegalStateException("Cannot schedule an appointment with ID " + appointmentId + " because it has expired.");
+        }
+
+        appointmentToBeScheduled.setStatus(AppointmentStatus.SCHEDULED);
+
+        return ApiResponse.toResponse(appointmentMapper.toResponse(appointmentToBeScheduled));
     }
 }

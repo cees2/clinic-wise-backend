@@ -5,9 +5,9 @@ import org.springframework.data.domain.Sort;
 import java.util.*;
 
 public final class SortUtil {
-    public static Sort parseFromString(String sort, Map<String, String> sortMap) {
+    public static Sort parseFromString(String sort, Map<String, String> sortMap, Sort defaultSort) {
         if (sort == null || sort.isEmpty()) {
-            return Sort.unsorted();
+            return defaultSort;
         }
 
         String[] sortParts = sort.split(",");
