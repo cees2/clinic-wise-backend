@@ -3,9 +3,11 @@ package com.clinicwise.backend.controller;
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.BaseFilter;
+import com.clinicwise.backend.common.list.sort.SearchSelectBaseFilter;
 import com.clinicwise.backend.dto.request.CreateRoomRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomRequest;
 import com.clinicwise.backend.dto.response.RoomResponse;
+import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.service.RoomService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +39,11 @@ public class RoomController {
     @PatchMapping("/{roomId}")
     public ApiResponse<RoomResponse> updateRoom(@PathVariable int roomId, @RequestBody UpdateRoomRequest updateRoomRequest){
         return roomService.updateRoom(roomId, updateRoomRequest);
+    }
+
+    @GetMapping("/search_select")
+    public ApiResponse<PageResponse<SearchSelect>> searchSelectRooms(@ModelAttribute SearchSelectBaseFilter searchSelectBaseFilter){
+        return roomService.searchSelect(searchSelectBaseFilter);
     }
 
     @DeleteMapping("/{roomId}")

@@ -3,9 +3,11 @@ package com.clinicwise.backend.service;
 import com.clinicwise.backend.api.response.ApiResponse;
 import com.clinicwise.backend.api.response.PageResponse;
 import com.clinicwise.backend.common.list.filter.BaseFilter;
+import com.clinicwise.backend.common.list.sort.SearchSelectBaseFilter;
 import com.clinicwise.backend.dto.request.CreateRoomRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomRequest;
 import com.clinicwise.backend.dto.response.RoomResponse;
+import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.entity.Room;
 import com.clinicwise.backend.exceptions.RoomWithNameExists;
 import com.clinicwise.backend.mapper.RoomMapper;
@@ -86,5 +88,15 @@ public class RoomService {
         if (room.isPresent()) {
             throw new RoomWithNameExists(name);
         }
+    }
+
+    public ApiResponse<PageResponse<SearchSelect>> searchSelect(SearchSelectBaseFilter searchSelectBaseFilter) {
+        Pageable pageable = PageRequest.of(searchSelectBaseFilter.getPage(), searchSelectBaseFilter.getSize());
+        Page<Room> rooms = roomRepository.findAll(RoomSpecifications.searchSelect(searchSelectBaseFilter.getSearch()), pageable);
+        List<SearchSelect> roomsSearchSelect = rooms.stream().map(roomMapper::toSearchSelect).toList();
+        boolean hasMore = rooms.getTotalPages() != searchSelectBaseFilter.getPage();
+        PageResponse<SearchSelect> pageResponse = new PageResponse<>(roomsSearchSelect, hasMore);
+
+        return ApiResponse.toResponse(pageResponse);
     }
 }

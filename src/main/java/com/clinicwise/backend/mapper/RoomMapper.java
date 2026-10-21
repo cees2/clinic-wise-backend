@@ -3,6 +3,7 @@ package com.clinicwise.backend.mapper;
 import com.clinicwise.backend.dto.request.CreateRoomRequest;
 import com.clinicwise.backend.dto.request.UpdateRoomRequest;
 import com.clinicwise.backend.dto.response.RoomResponse;
+import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.entity.Room;
 import org.springframework.stereotype.Component;
 
@@ -28,5 +29,9 @@ public class RoomMapper {
 
     public RoomResponse toResponse(Room room) {
         return new RoomResponse(room.getId(), room.getName());
+    }
+
+    public SearchSelect toSearchSelect(Room room) {
+        return new SearchSelect(room.getId(), room.getName());
     }
 }
