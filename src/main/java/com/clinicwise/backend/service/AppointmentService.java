@@ -16,6 +16,7 @@ import com.clinicwise.backend.repository.AppointmentRepository;
 import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.service.dto.PatientEmployee;
+import com.clinicwise.backend.specification.AppointmentDomainValidator;
 import com.clinicwise.backend.specification.AppointmentSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
@@ -25,7 +26,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +44,14 @@ public class AppointmentService {
     private AppointmentMapper appointmentMapper;
     private EmployeeRepository employeeRepository;
     private PatientRepository patientRepository;
+    private AppointmentDomainValidator appointmentErrorSpecification;
 
-    public AppointmentService(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper, EmployeeRepository employeeRepository, PatientRepository patientRepository) {
+    public AppointmentService(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper, EmployeeRepository employeeRepository, PatientRepository patientRepository, AppointmentDomainValidator appointmentErrorSpecification) {
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
         this.employeeRepository = employeeRepository;
         this.patientRepository = patientRepository;
+        this.appointmentErrorSpecification = appointmentErrorSpecification;
     }
 
     public PageResponse<AppointmentResponse> getAllAppointments(AppointmentsFilter appointmentFilter) {
@@ -77,9 +79,9 @@ public class AppointmentService {
         Integer patientId = createAppointmentRequest.patientId();
         Integer employeeId = createAppointmentRequest.employeeId();
         PatientEmployee patientEmployee = checkIfPatientAndEmployeeExists(patientId, employeeId);
-
         Appointment appointment = appointmentMapper.createAppointmentFromRequest(createAppointmentRequest, patientEmployee.patient(), patientEmployee.employee());
 
+        appointmentErrorSpecification.validate(appointment);
         appointmentRepository.save(appointment);
 
         return ApiResponse.toResponse(appointmentMapper.toResponse(appointment));
@@ -94,6 +96,7 @@ public class AppointmentService {
         PatientEmployee patientEmployee = checkIfPatientAndEmployeeExists(patientId, employeeId);
 
         appointmentMapper.updateAppointmentFromRequest(updateAppointmentRequest, appointmentToBeUpdated, patientEmployee.employee(), patientEmployee.patient());
+        appointmentErrorSpecification.validate(appointmentToBeUpdated);
 
         return ApiResponse.toResponse(appointmentMapper.toResponse(appointmentToBeUpdated));
     }

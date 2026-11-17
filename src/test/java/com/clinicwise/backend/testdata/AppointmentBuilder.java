@@ -11,6 +11,7 @@ public class AppointmentBuilder {
     private LocalDateTime createdAt = LocalDateTime.of(2020, 1, 1, 0,0,0,0);
     private LocalDateTime startDate = LocalDateTime.of(2020, 1, 1, 0,0,0,0);
     private int duration = 10;
+    private LocalDateTime endDate = null;
     private AppointmentStatus appointmentStatus = AppointmentStatus.SCHEDULED;
     private String additionalNote = "";
     private Employee employee = EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().build()).build();
@@ -20,6 +21,7 @@ public class AppointmentBuilder {
 
     public AppointmentBuilder withCreatedAt(LocalDateTime createdAt){this.createdAt = createdAt; return this;}
     public AppointmentBuilder withStartDate(LocalDateTime startDate){this.startDate = startDate; return this;}
+    public AppointmentBuilder withEndDate(LocalDateTime endDate){this.endDate = endDate; return this;}
     public AppointmentBuilder withDuration(int duration){this.duration = duration; return this;}
     public AppointmentBuilder withAppointmentStatus(AppointmentStatus appointmentStatus){this.appointmentStatus = appointmentStatus; return this;}
     public AppointmentBuilder withAdditionalNote(String additionalNote){this.additionalNote = additionalNote; return this;}
@@ -32,6 +34,7 @@ public class AppointmentBuilder {
 
         appointment.setCreatedAt(createdAt);
         appointment.setStartDate(startDate);
+        appointment.setEndDate(endDate != null ? endDate : startDate.plusMinutes(duration));
         appointment.setDuration(duration);
         appointment.setStatus(appointmentStatus);
         appointment.setAdditionalNote(additionalNote);

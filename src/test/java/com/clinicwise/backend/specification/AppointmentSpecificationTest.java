@@ -15,6 +15,11 @@ import com.clinicwise.backend.testdata.PatientBuilder;
 import com.clinicwise.backend.testdata.UserBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
@@ -23,6 +28,7 @@ import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -416,5 +422,154 @@ class AppointmentSpecificationTest {
 
         assertEquals(2, appointments.size());
         assertTrue(appointmentIds.containsAll(List.of(matchingStartDateAppointment0.getId(), matchingStartDateAppointment1.getId())));
+    }
+
+    private static final LocalDateTime EXISTING_START = LocalDateTime.of(2026, 1, 1, 12, 0);
+    private static final int EXISTING_DURATION = 60;
+
+    private Appointment persistExistingAppointment(Patient patient, Employee employee, AppointmentStatus status) {
+        Appointment existing = testEntityManager.persist(
+                AppointmentBuilder.anAppointment()
+                        .withPatient(patient)
+                        .withEmployee(employee)
+                        .withStartDate(EXISTING_START)
+                        .withDuration(EXISTING_DURATION)
+                        .withStatus(status)
+                        .build());
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        return existing;
+    }
+
+    private Appointment newAppointment(Patient patient, Employee employee, LocalDateTime startDate, int duration) {
+        return AppointmentBuilder.anAppointment()
+                .withPatient(patient)
+                .withEmployee(employee)
+                .withStartDate(startDate)
+                .withDuration(duration)
+                .build();
+    }
+
+    public static Stream<Arguments> overlappingDates() {
+        return Stream.of(
+                Arguments.of("starts before, ends inside", EXISTING_START.minusMinutes(10), 20),
+                Arguments.of("starts inside, ends after", EXISTING_START.plusMinutes(EXISTING_DURATION - 10), 20),
+                Arguments.of("wraps the existing one", EXISTING_START.minusMinutes(10), EXISTING_DURATION + 20),
+                Arguments.of("inside the existing one", EXISTING_START.plusMinutes(10), 20),
+                Arguments.of("same start and end", EXISTING_START, EXISTING_DURATION)
+        );
+    }
+
+    public static Stream<Arguments> nonOverlappingDates() {
+        return Stream.of(
+                Arguments.of("ends exactly at existing start", EXISTING_START.minusMinutes(30), 30),
+                Arguments.of("starts exactly at existing end", EXISTING_START.plusMinutes(EXISTING_DURATION), 30),
+                Arguments.of("ends before existing start", EXISTING_START.minusMinutes(60), 30),
+                Arguments.of("starts after existing end", EXISTING_START.plusMinutes(EXISTING_DURATION + 30), 30)
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("overlappingDates")
+    @DisplayName("Should find the existing SCHEDULED appointment of the same patient and employee when dates overlap")
+    void findOverlapping_overlappingDates(String name, LocalDateTime newStartDate, int newDuration) {
+        Patient patient = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().build()).build());
+        Employee employee = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().build()).build());
+        Appointment existing = persistExistingAppointment(patient, employee, AppointmentStatus.SCHEDULED);
+
+        List<Appointment> overlapping = appointmentRepository.findAll(
+                AppointmentSpecification.findOverlapping(newAppointment(patient, employee, newStartDate, newDuration)));
+
+        assertEquals(1, overlapping.size());
+        assertEquals(existing.getId(), overlapping.getFirst().getId());
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("nonOverlappingDates")
+    @DisplayName("Should not find anything when dates do not overlap, including touching edges")
+    void findOverlapping_nonOverlappingDates(String name, LocalDateTime newStartDate, int newDuration) {
+        Patient patient = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().build()).build());
+        Employee employee = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().build()).build());
+        persistExistingAppointment(patient, employee, AppointmentStatus.SCHEDULED);
+
+        List<Appointment> overlapping = appointmentRepository.findAll(
+                AppointmentSpecification.findOverlapping(newAppointment(patient, employee, newStartDate, newDuration)));
+
+        assertTrue(overlapping.isEmpty());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AppointmentStatus.class, names = "SCHEDULED", mode = EnumSource.Mode.EXCLUDE)
+    @DisplayName("Should ignore overlapping appointments that are not SCHEDULED")
+    void findOverlapping_ignoresNotScheduled(AppointmentStatus status) {
+        Patient patient = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().build()).build());
+        Employee employee = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().build()).build());
+        persistExistingAppointment(patient, employee, status);
+
+        List<Appointment> overlapping = appointmentRepository.findAll(
+                AppointmentSpecification.findOverlapping(newAppointment(patient, employee, EXISTING_START, EXISTING_DURATION)));
+
+        assertTrue(overlapping.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should find overlapping appointment of the same employee even with a different patient")
+    void findOverlapping_sameEmployeeDifferentPatient() {
+        Patient patient = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().build()).build());
+        Patient otherPatient = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().build()).build());
+        Employee employee = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().build()).build());
+        Appointment existing = persistExistingAppointment(patient, employee, AppointmentStatus.SCHEDULED);
+
+        List<Appointment> overlapping = appointmentRepository.findAll(
+                AppointmentSpecification.findOverlapping(newAppointment(otherPatient, employee, EXISTING_START, EXISTING_DURATION)));
+
+        assertEquals(1, overlapping.size());
+        assertEquals(existing.getId(), overlapping.getFirst().getId());
+    }
+
+    @Test
+    @DisplayName("Should find overlapping appointment of the same patient even with a different employee")
+    void findOverlapping_samePatientDifferentEmployee() {
+        Patient patient = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().build()).build());
+        Employee employee = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().build()).build());
+        Employee otherEmployee = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().build()).build());
+        Appointment existing = persistExistingAppointment(patient, employee, AppointmentStatus.SCHEDULED);
+
+        List<Appointment> overlapping = appointmentRepository.findAll(
+                AppointmentSpecification.findOverlapping(newAppointment(patient, otherEmployee, EXISTING_START, EXISTING_DURATION)));
+
+        assertEquals(1, overlapping.size());
+        assertEquals(existing.getId(), overlapping.getFirst().getId());
+    }
+
+    @Test
+    @DisplayName("Should not find overlapping appointment when both patient and employee differ")
+    void findOverlapping_differentPatientAndEmployee() {
+        Patient patient = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().build()).build());
+        Patient otherPatient = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().build()).build());
+        Employee employee = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().build()).build());
+        Employee otherEmployee = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().build()).build());
+        persistExistingAppointment(patient, employee, AppointmentStatus.SCHEDULED);
+
+        List<Appointment> overlapping = appointmentRepository.findAll(
+                AppointmentSpecification.findOverlapping(newAppointment(otherPatient, otherEmployee, EXISTING_START, EXISTING_DURATION)));
+
+        assertTrue(overlapping.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should not report an existing appointment as overlapping with itself when it is being updated")
+    void findOverlapping_excludesItself() {
+        Patient patient = testEntityManager.persist(PatientBuilder.aPatient().withUser(UserBuilder.aUser().build()).build());
+        Employee employee = testEntityManager.persist(EmployeeBuilder.anEmployee().withUser(UserBuilder.aUser().build()).build());
+        Appointment existing = persistExistingAppointment(patient, employee, AppointmentStatus.SCHEDULED);
+
+        Appointment beingUpdated = newAppointment(patient, employee, EXISTING_START, EXISTING_DURATION);
+        beingUpdated.setId(existing.getId());
+
+        List<Appointment> overlapping = appointmentRepository.findAll(AppointmentSpecification.findOverlapping(beingUpdated));
+
+        assertTrue(overlapping.isEmpty());
     }
 }

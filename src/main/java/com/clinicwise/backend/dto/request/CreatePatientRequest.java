@@ -21,7 +21,7 @@ public record CreatePatientRequest(
         String documentId,
         @NotBlank
         String address,
-        @NotBlank
+        @NotNull
         Country nationality,
         @NotBlank
         String phoneNumber,

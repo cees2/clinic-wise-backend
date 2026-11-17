@@ -4,17 +4,15 @@ import com.clinicwise.backend.common.list.filter.AppointmentsFilter;
 import com.clinicwise.backend.common.list.filter.FilterCondition;
 import com.clinicwise.backend.common.list.filter.ParsedFilter;
 import com.clinicwise.backend.entity.Appointment;
+import com.clinicwise.backend.enums.AppointmentStatus;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class AppointmentSpecification {
     public static Specification<Appointment> whereFilter(AppointmentsFilter appointmentsFilter) {
@@ -85,6 +83,30 @@ public class AppointmentSpecification {
             }
 
             return cb.and(predicates);
+        };
+    }
+
+    public static Specification<Appointment> findOverlapping(Appointment appointment) {
+        return (root, query, cb) -> {
+            LocalDateTime appointmentStartDate = appointment.getStartDate();
+            LocalDateTime appointmentEndDate = appointment.getStartDate().plusMinutes(appointment.getDuration());
+
+            Predicate overlapping = cb.and(
+                    cb.lessThan(root.get("startDate"), appointmentEndDate),
+                    cb.greaterThan(root.get("endDate"), appointmentStartDate)
+            );
+            Predicate employeeOrPatient = cb.or(
+                    cb.equal(root.get("employee").get("id"), appointment.getEmployee().getId()),
+                    cb.equal(root.get("patient").get("id"), appointment.getPatient().getId())
+            );
+            Predicate scheduled = cb.equal(root.get("status"), AppointmentStatus.SCHEDULED);
+            List<Predicate> predicateList = new ArrayList<>(List.of(overlapping, employeeOrPatient, scheduled));
+
+            if(appointment.getId() != null){
+                predicateList.add(cb.notEqual(root.get("id"), appointment.getId()));
+            }
+
+            return cb.and(predicateList);
         };
     }
 }

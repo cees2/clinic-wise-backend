@@ -1,9 +1,6 @@
 package com.clinicwise.backend.error;
 
-import com.clinicwise.backend.exceptions.AvatarUploadException;
-import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
-import com.clinicwise.backend.exceptions.RoomOccupancyOverlapping;
-import com.clinicwise.backend.exceptions.RoomWithNameExists;
+import com.clinicwise.backend.exceptions.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -13,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestControllerAdvice
@@ -42,16 +40,21 @@ public class GlobalExceptionHandler {
         List<ValidationError> validationErrors = exception.getBindingResult().getFieldErrors()
                 .stream()
                 .map(fieldError -> {
-                            String field = fieldError.getField();
-                            String value = fieldError.getDefaultMessage();
+                            String code = fieldError.getCode();
+                            String message = fieldError.getDefaultMessage();
+                            String field = toSnakeCase(fieldError.getField());
 
-                            return new ValidationError(field, value);
+                            return new ValidationError(code, message, List.of(field), null);
                         }
                 )
                 .toList();
         ApiError error = new ApiError(ErrorCode.VALIDATION_ERROR, "Incorrect input provided", validationErrors);
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+
+    private static String toSnakeCase(String field) {
+        return field.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toLowerCase();
     }
 
     @ExceptionHandler(UserWithProvidedDataExists.class)
@@ -68,16 +71,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    @ExceptionHandler(RoomWithNameExists.class)
-    public ResponseEntity<ApiError> roomWithNameExistsHandler(RoomWithNameExists exception) {
-        ApiError error = new ApiError(ErrorCode.VALIDATION_ERROR, exception.getMessage());
-
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
-    }
-
-    @ExceptionHandler(RoomOccupancyOverlapping.class)
-    public ResponseEntity<ApiError> roomOccupancyOverlappingHandler(RoomOccupancyOverlapping exception) {
-        ApiError error = new ApiError(ErrorCode.VALIDATION_ERROR, exception.getMessage());
+    @ExceptionHandler(DomainValidationException.class)
+    public ResponseEntity<ApiError> roomOccupancyOverlappingHandler(DomainValidationException exception) {
+        ApiError error = new ApiError(ErrorCode.VALIDATION_ERROR, exception.getMessage(), exception.getValidationErrors());
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
     }

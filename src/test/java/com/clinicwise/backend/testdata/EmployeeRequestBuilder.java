@@ -18,7 +18,7 @@ public class EmployeeRequestBuilder {
     private String phoneNumber = "123123123";
     private EmployeeRole role = EmployeeRole.DOCTOR;
     private String documentId = "AA 001";
-    private String username = "damian.mirek";
+    private String username = "damianmirek";
     private String password = "password";
 
     public static EmployeeRequestBuilder anEmployeeRequest(){

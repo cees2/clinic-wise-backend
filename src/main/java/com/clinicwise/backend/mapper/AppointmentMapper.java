@@ -40,6 +40,7 @@ public class AppointmentMapper {
         appointment.setEmployee(employee);
         appointment.setPatient(patient);
         appointment.setStatus(AppointmentStatus.SCHEDULED);
+        appointment.setEndDate(createAppointmentRequest.startDate().plusMinutes(createAppointmentRequest.duration()));
 
         return appointment;
     }
@@ -56,6 +57,11 @@ public class AppointmentMapper {
         if (additionalNote != null) appointment.setAdditionalNote(additionalNote);
         if (employee != null) appointment.setEmployee(employee);
         if (patient != null) appointment.setPatient(patient);
+        if (duration != null || startDate != null) {
+            LocalDateTime appointmentStartDate = startDate != null ? startDate : appointment.getStartDate();
+            int newDuration = duration != null ? duration : appointment.getDuration();
+            appointment.setEndDate(appointmentStartDate.plusMinutes(newDuration));
+        }
 
         return appointment;
     }

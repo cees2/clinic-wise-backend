@@ -38,7 +38,7 @@ public class AppointmentController {
     }
 
     @PatchMapping("/{appointmentId}")
-    public ApiResponse<AppointmentResponse> updateAppointment(@PathVariable int appointmentId, @RequestBody UpdateAppointmentRequest updateAppointmentRequest){
+    public ApiResponse<AppointmentResponse> updateAppointment(@PathVariable int appointmentId, @Valid @RequestBody UpdateAppointmentRequest updateAppointmentRequest){
         return appointmentService.updateAppointment(appointmentId,updateAppointmentRequest);
     }
 

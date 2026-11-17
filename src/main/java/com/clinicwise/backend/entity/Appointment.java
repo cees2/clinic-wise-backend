@@ -16,6 +16,8 @@ public class Appointment {
     private Integer duration;
     @Column(nullable = false)
     private LocalDateTime startDate;
+    @Column(nullable = false)
+    private LocalDateTime endDate;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AppointmentStatus status;
@@ -90,4 +92,8 @@ public class Appointment {
     public void setEmployee(Employee employee) {
         this.employee = employee;
     }
+
+    public LocalDateTime getEndDate() {return endDate;}
+
+    public void setEndDate(LocalDateTime endDate) {this.endDate = endDate;}
 }
