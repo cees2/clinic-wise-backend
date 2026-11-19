@@ -13,6 +13,7 @@ public class EmployeeBuilder {
     private LocalDate startDate = LocalDate.of(2020, 1, 1);
     private EmployeeRole employeeRole = EmployeeRole.DOCTOR;
     private LocalDateTime createdAt = LocalDateTime.of(2020, 1, 1, 0,0,0);
+    private Integer id = null;
 
     public EmployeeBuilder withUser(User user){this.user = user; return this;}
     public EmployeeBuilder withStartDate(LocalDate startDate){this.startDate = startDate; return this;}
@@ -20,6 +21,7 @@ public class EmployeeBuilder {
     public EmployeeBuilder withCreatedAt(LocalDateTime createdAt){this.createdAt = createdAt; return this;}
     public EmployeeBuilder withBirthDate(LocalDate birthDate) {this.user.setDateOfBirth(birthDate); return this;}
     public EmployeeBuilder withNationality(Country country) {this.user.setNationality(country); return this;}
+    public EmployeeBuilder withId(Integer id) {this.id = id; return this;}
 
     public static EmployeeBuilder anEmployee(){
         EmployeeBuilder employeeBuilder = new EmployeeBuilder();
@@ -33,6 +35,7 @@ public class EmployeeBuilder {
         employee.setRole(this.employeeRole);
         employee.setStartDate(this.startDate);
         employee.setCreatedAt(this.createdAt);
+        employee.setId(this.id);
 
         return employee;
     }
