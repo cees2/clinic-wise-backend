@@ -44,14 +44,14 @@ public class AppointmentService {
     private AppointmentMapper appointmentMapper;
     private EmployeeRepository employeeRepository;
     private PatientRepository patientRepository;
-    private AppointmentDomainValidator appointmentErrorSpecification;
+    private AppointmentDomainValidator appointmentDomainValidator;
 
-    public AppointmentService(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper, EmployeeRepository employeeRepository, PatientRepository patientRepository, AppointmentDomainValidator appointmentErrorSpecification) {
+    public AppointmentService(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper, EmployeeRepository employeeRepository, PatientRepository patientRepository, AppointmentDomainValidator appointmentDomainValidator) {
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
         this.employeeRepository = employeeRepository;
         this.patientRepository = patientRepository;
-        this.appointmentErrorSpecification = appointmentErrorSpecification;
+        this.appointmentDomainValidator = appointmentDomainValidator;
     }
 
     public PageResponse<AppointmentResponse> getAllAppointments(AppointmentsFilter appointmentFilter) {
@@ -81,7 +81,7 @@ public class AppointmentService {
         PatientEmployee patientEmployee = checkIfPatientAndEmployeeExists(patientId, employeeId);
         Appointment appointment = appointmentMapper.createAppointmentFromRequest(createAppointmentRequest, patientEmployee.patient(), patientEmployee.employee());
 
-        appointmentErrorSpecification.validate(appointment);
+        appointmentDomainValidator.validate(appointment);
         appointmentRepository.save(appointment);
 
         return ApiResponse.toResponse(appointmentMapper.toResponse(appointment));
@@ -96,7 +96,7 @@ public class AppointmentService {
         PatientEmployee patientEmployee = checkIfPatientAndEmployeeExists(patientId, employeeId);
 
         appointmentMapper.updateAppointmentFromRequest(updateAppointmentRequest, appointmentToBeUpdated, patientEmployee.employee(), patientEmployee.patient());
-        appointmentErrorSpecification.validate(appointmentToBeUpdated);
+        appointmentDomainValidator.validate(appointmentToBeUpdated);
 
         return ApiResponse.toResponse(appointmentMapper.toResponse(appointmentToBeUpdated));
     }

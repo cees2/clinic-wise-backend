@@ -4,6 +4,7 @@ import com.clinicwise.backend.entity.Appointment;
 import com.clinicwise.backend.error.ValidationError;
 import com.clinicwise.backend.error.specificationError.DomainValidator;
 import com.clinicwise.backend.repository.AppointmentRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,7 +15,8 @@ import java.util.Map;
 public class AppointmentDomainValidator extends DomainValidator<Appointment> {
     private final AppointmentRepository appointmentRepository;
 
-    public AppointmentDomainValidator(AppointmentRepository appointmentRepository) {
+    public AppointmentDomainValidator(AppointmentRepository appointmentRepository, EntityManager entityManager) {
+        super(entityManager);
         this.appointmentRepository = appointmentRepository;
     }
 

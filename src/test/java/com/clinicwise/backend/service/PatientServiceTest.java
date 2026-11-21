@@ -9,7 +9,6 @@ import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.Gender;
 import com.clinicwise.backend.enums.PatientSubscriptionPlan;
-import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
 import com.clinicwise.backend.mapper.PatientMapper;
 import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.repository.UserRepository;

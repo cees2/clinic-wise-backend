@@ -80,7 +80,6 @@ public class PatientMapper {
         String username = updatePatientRequest.username();
         String password = updatePatientRequest.password();
 
-
         if (firstname != null) patientToBeUpdated.getUser().setFirstname(firstname);
         if (lastname != null) patientToBeUpdated.getUser().setLastname(lastname);
         if (gender != null) patientToBeUpdated.getUser().setGender(gender);

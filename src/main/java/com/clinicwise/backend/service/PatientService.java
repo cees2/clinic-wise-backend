@@ -10,13 +10,11 @@ import com.clinicwise.backend.dto.request.UpdatePatientRequest;
 import com.clinicwise.backend.dto.response.PatientResponse;
 import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.entity.Patient;
-import com.clinicwise.backend.entity.User;
-import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
 import com.clinicwise.backend.mapper.PatientMapper;
 import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.repository.UserRepository;
 import com.clinicwise.backend.specification.PatientSpecification;
-import com.clinicwise.backend.specification.UserSpecifications;
+import com.clinicwise.backend.specification.PatientsDomainValidator;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,11 +38,13 @@ public class PatientService {
     private PatientRepository patientRepository;
     private UserRepository userRepository;
     private PatientMapper patientMapper;
+    private PatientsDomainValidator patientsDomainValidator;
 
-    public PatientService(PatientRepository patientRepository, UserRepository userRepository, PatientMapper patientMapper) {
+    public PatientService(PatientRepository patientRepository, UserRepository userRepository, PatientMapper patientMapper, PatientsDomainValidator patientsDomainValidator) {
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
         this.patientMapper = patientMapper;
+        this.patientsDomainValidator = patientsDomainValidator;
     }
 
     public PageResponse<PatientResponse> getAllPatients(PatientsFilter patientsFilter) {
@@ -71,30 +71,17 @@ public class PatientService {
     public ApiResponse<PatientResponse> updatePatient(int patientId, UpdatePatientRequest updatePatientRequest) {
         Patient patientToBeUpdated = patientRepository.findById(patientId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a patient with ID: " + patientId));
-
-        assertNoDuplicatePatient(
-                patientToBeUpdated.getUser().getId(),
-                updatePatientRequest.documentId(),
-                updatePatientRequest.phoneNumber(),
-                updatePatientRequest.username()
-        );
-
-        patientMapper.updatePatientFromRequest(updatePatientRequest, patientToBeUpdated);
+        Patient patient = patientMapper.updatePatientFromRequest(updatePatientRequest, patientToBeUpdated);
+        patientsDomainValidator.validate(patient);
 
         return ApiResponse.toResponse(patientMapper.toResponse(patientToBeUpdated));
     }
 
     @Transactional
     public ApiResponse<PatientResponse> createPatient(CreatePatientRequest createPatientRequest) {
-        assertNoDuplicatePatient(
-                null,
-                createPatientRequest.documentId(),
-                createPatientRequest.phoneNumber(),
-                createPatientRequest.username()
-        );
-
         Patient patient = patientMapper.createPatientFromRequest(createPatientRequest);
 
+        patientsDomainValidator.validate(patient);
         userRepository.save(patient.getUser());
         patientRepository.save(patient);
 
@@ -130,17 +117,5 @@ public class PatientService {
         PageResponse<SearchSelect> pageResponse = new PageResponse<>(employeesSearchSelect, hasMore);
 
         return ApiResponse.toResponse(pageResponse);
-    }
-
-    private void assertNoDuplicatePatient(Integer patientUserId, String documentId, String phoneNumber, String username) {
-        List<User> usersWithSimilarData = userRepository
-                .findAll(
-                        UserSpecifications
-                                .hasDocumentIDOrPhoneNumberOrUserName(documentId, phoneNumber, username)
-                );
-
-        if (usersWithSimilarData.stream().anyMatch(user -> !user.getId().equals(patientUserId))) {
-            throw new UserWithProvidedDataExists();
-        }
     }
 }

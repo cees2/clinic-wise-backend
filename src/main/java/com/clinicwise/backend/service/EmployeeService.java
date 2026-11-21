@@ -11,12 +11,10 @@ import com.clinicwise.backend.dto.response.EmployeeResponse;
 import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.entity.Employee;
 import com.clinicwise.backend.entity.User;
-import com.clinicwise.backend.exceptions.UserWithProvidedDataExists;
 import com.clinicwise.backend.mapper.EmployeeMapper;
 import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.UserRepository;
 import com.clinicwise.backend.specification.EmployeesSpecification;
-import com.clinicwise.backend.specification.UserSpecifications;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -70,12 +68,6 @@ public class EmployeeService {
 
     @Transactional
     public ApiResponse<EmployeeResponse> createEmployee(CreateEmployeeRequest createEmployeeRequest) {
-        assertNoDuplicateUser(null,
-                createEmployeeRequest.documentId(),
-                createEmployeeRequest.phoneNumber(),
-                createEmployeeRequest.username()
-        );
-
         Employee employee = employeeMapper.createEmployeeFromRequest(createEmployeeRequest);
 
         employeeRepository.save(employee);
@@ -87,13 +79,6 @@ public class EmployeeService {
     public ApiResponse<EmployeeResponse> updateEmployee(int employeeId, UpdateEmployeeRequest updateEmployeeRequest) {
         Employee employeeToBeUpdated = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find an employee with given ID"));
-
-        assertNoDuplicateUser(
-                employeeToBeUpdated.getUser().getId(),
-                updateEmployeeRequest.documentId(),
-                updateEmployeeRequest.phoneNumber(),
-                updateEmployeeRequest.username()
-        );
         employeeMapper.updateEmployeeFromRequest(updateEmployeeRequest, employeeToBeUpdated);
 
         return ApiResponse.toResponse(employeeMapper.toResponse(employeeToBeUpdated));
@@ -117,18 +102,6 @@ public class EmployeeService {
         PageResponse<SearchSelect> pageResponse = new PageResponse<>(employeesSearchSelect, hasMore);
 
         return ApiResponse.toResponse(pageResponse);
-    }
-
-    private void assertNoDuplicateUser(Integer userId, String documentId, String phoneNumber, String username) {
-        List<User> usersWithSimilarData = userRepository
-                .findAll(
-                        UserSpecifications
-                                .hasDocumentIDOrPhoneNumberOrUserName(documentId, phoneNumber, username)
-                );
-
-        if (usersWithSimilarData.stream().anyMatch(user -> !user.getId().equals(userId))) {
-            throw new UserWithProvidedDataExists();
-        }
     }
 
     @Transactional
