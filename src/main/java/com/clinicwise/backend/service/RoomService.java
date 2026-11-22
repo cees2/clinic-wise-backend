@@ -9,9 +9,9 @@ import com.clinicwise.backend.dto.request.UpdateRoomRequest;
 import com.clinicwise.backend.dto.response.RoomResponse;
 import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.entity.Room;
-import com.clinicwise.backend.exceptions.RoomWithNameExists;
 import com.clinicwise.backend.mapper.RoomMapper;
 import com.clinicwise.backend.repository.RoomRepository;
+import com.clinicwise.backend.specification.RoomDomainValidator;
 import com.clinicwise.backend.specification.RoomSpecifications;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
@@ -27,10 +27,12 @@ import java.util.Optional;
 public class RoomService {
     private RoomRepository roomRepository;
     private RoomMapper roomMapper;
+    private RoomDomainValidator roomDomainValidator;
 
-    public RoomService(RoomRepository roomRepository, RoomMapper roomMapper) {
+    public RoomService(RoomRepository roomRepository, RoomMapper roomMapper, RoomDomainValidator roomDomainValidator) {
         this.roomRepository = roomRepository;
         this.roomMapper = roomMapper;
+        this.roomDomainValidator = roomDomainValidator;
     }
 
     public PageResponse<RoomResponse> getAllRooms(BaseFilter baseFilter) {
@@ -53,9 +55,9 @@ public class RoomService {
 
     @Transactional
     public ApiResponse<RoomResponse> createRoom(CreateRoomRequest createRoomRequest) {
-        checkIfRoomWithMatchingNameExists(createRoomRequest.name());
         Room roomToBeCreated = roomMapper.createRoomFromRequest(createRoomRequest);
 
+        roomDomainValidator.validate(roomToBeCreated);
         roomRepository.save(roomToBeCreated);
 
         return ApiResponse.toResponse(roomMapper.toResponse(roomToBeCreated));
@@ -63,11 +65,11 @@ public class RoomService {
 
     @Transactional
     public ApiResponse<RoomResponse> updateRoom(int roomId, UpdateRoomRequest updateRoomRequest) {
-        checkIfRoomWithMatchingNameExists(updateRoomRequest.name());
         Room roomToBeUpdated = roomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a room with ID: " + roomId));
 
-        roomMapper.updateRoomFromRequest(updateRoomRequest, roomToBeUpdated);
+        Room updated = roomMapper.updateRoomFromRequest(updateRoomRequest, roomToBeUpdated);
+        roomDomainValidator.validate(updated);
 
         return ApiResponse.toResponse(roomMapper.toResponse(roomToBeUpdated));
     }
@@ -78,16 +80,6 @@ public class RoomService {
                 .orElseThrow(() -> new EntityNotFoundException("Could not find a room with ID: " + roomId));
 
         roomRepository.delete(roomToBeDeleted);
-    }
-
-    public void checkIfRoomWithMatchingNameExists(String name) {
-        if (name == null) return;
-
-        Optional<Room> room = roomRepository.findOne(RoomSpecifications.hasName(name));
-
-        if (room.isPresent()) {
-            throw new RoomWithNameExists(name);
-        }
     }
 
     public ApiResponse<PageResponse<SearchSelect>> searchSelect(SearchSelectBaseFilter searchSelectBaseFilter) {

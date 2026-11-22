@@ -49,18 +49,24 @@ public class RoomOccupancySpecification {
         };
     }
 
-    public static PredicateSpecification<RoomOccupancy> overlappingDatesAndRoomOrEmployee(LocalDateTime startTime, LocalDateTime endTime, Integer roomId, Integer employeeId) {
+    public static PredicateSpecification<RoomOccupancy> overlappingDatesAndRoomOrEmployee(RoomOccupancy roomOccupancy) {
         PredicateSpecification<RoomOccupancy> overlappingDates = (root, builder) -> {
-            Predicate startsBeforeEnd = builder.lessThan(root.get("startTime"), endTime);
-            Predicate endsAfterStart = builder.greaterThan(root.get("endTime"), startTime);
+            Predicate startsBeforeEnd = builder.lessThan(root.get("startTime"), roomOccupancy.getEndTime());
+            Predicate endsAfterStart = builder.greaterThan(root.get("endTime"), roomOccupancy.getStartTime());
 
             return builder.and(startsBeforeEnd, endsAfterStart);
         };
         PredicateSpecification<RoomOccupancy> matchingEmployee = (root, builder) ->
-                builder.equal(root.get("employee").get("id"), employeeId);
+                builder.equal(root.get("employee").get("id"), roomOccupancy.getEmployee().getId());
         PredicateSpecification<RoomOccupancy> matchingRoom = (root, builder) ->
-                builder.equal(root.get("room").get("id"), roomId);
+                builder.equal(root.get("room").get("id"), roomOccupancy.getRoom().getId());
+        PredicateSpecification<RoomOccupancy> conflicting = matchingEmployee.or(matchingRoom).and(overlappingDates);
 
-        return matchingEmployee.or(matchingRoom).and(overlappingDates);
+        if (roomOccupancy.getId() == null) return conflicting;
+
+        PredicateSpecification<RoomOccupancy> notSelf = (root, builder) ->
+                builder.notEqual(root.get("id"), roomOccupancy.getId());
+
+        return conflicting.and(notSelf);
     }
 }

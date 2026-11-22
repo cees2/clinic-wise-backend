@@ -38,7 +38,6 @@ public class AppointmentDomainValidator extends DomainValidator<Appointment> {
             validationErrors.add(new ValidationError("EMPLOYEE_BUSY", "Employee cannot have another appointment at the same time", List.of("employee_id", "start_date", "duration"), Map.of("conflicting_appointment_ids", conflictingEmployees)));
         }
 
-
         return validationErrors;
     }
 }
