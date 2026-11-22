@@ -10,10 +10,10 @@ import com.clinicwise.backend.dto.request.UpdateEmployeeRequest;
 import com.clinicwise.backend.dto.response.EmployeeResponse;
 import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.entity.Employee;
-import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.mapper.EmployeeMapper;
 import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.UserRepository;
+import com.clinicwise.backend.specification.EmployeesDomainValidator;
 import com.clinicwise.backend.specification.EmployeesSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
@@ -40,11 +40,13 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
     private EmployeeMapper employeeMapper;
     private UserRepository userRepository;
+    private EmployeesDomainValidator employeesDomainValidator;
 
-    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper, UserRepository userRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper, UserRepository userRepository, EmployeesDomainValidator employeesDomainValidator) {
         this.employeeRepository = employeeRepository;
         this.employeeMapper = employeeMapper;
         this.userRepository = userRepository;
+        this.employeesDomainValidator = employeesDomainValidator;
     }
 
     public PageResponse<EmployeeResponse> getAllEmployees(EmployeesFilter employeeFilter) {
@@ -70,6 +72,7 @@ public class EmployeeService {
     public ApiResponse<EmployeeResponse> createEmployee(CreateEmployeeRequest createEmployeeRequest) {
         Employee employee = employeeMapper.createEmployeeFromRequest(createEmployeeRequest);
 
+        employeesDomainValidator.validate(employee);
         employeeRepository.save(employee);
 
         return ApiResponse.toResponse(employeeMapper.toResponse(employee));
@@ -79,7 +82,8 @@ public class EmployeeService {
     public ApiResponse<EmployeeResponse> updateEmployee(int employeeId, UpdateEmployeeRequest updateEmployeeRequest) {
         Employee employeeToBeUpdated = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find an employee with given ID"));
-        employeeMapper.updateEmployeeFromRequest(updateEmployeeRequest, employeeToBeUpdated);
+        Employee employee = employeeMapper.updateEmployeeFromRequest(updateEmployeeRequest, employeeToBeUpdated);
+        employeesDomainValidator.validate(employee);
 
         return ApiResponse.toResponse(employeeMapper.toResponse(employeeToBeUpdated));
     }

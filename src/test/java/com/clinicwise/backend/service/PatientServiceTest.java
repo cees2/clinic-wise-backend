@@ -9,9 +9,11 @@ import com.clinicwise.backend.entity.Patient;
 import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.Gender;
 import com.clinicwise.backend.enums.PatientSubscriptionPlan;
+import com.clinicwise.backend.exceptions.DomainValidationException;
 import com.clinicwise.backend.mapper.PatientMapper;
 import com.clinicwise.backend.repository.PatientRepository;
 import com.clinicwise.backend.repository.UserRepository;
+import com.clinicwise.backend.specification.PatientsDomainValidator;
 import com.clinicwise.backend.testdata.PatientBuilder;
 import com.clinicwise.backend.testdata.UserBuilder;
 import jakarta.persistence.EntityNotFoundException;
@@ -48,6 +50,8 @@ class PatientServiceTest {
     private UserRepository userRepository;
     @InjectMocks
     private PatientService patientService;
+    @Mock
+    private PatientsDomainValidator patientsDomainValidator;
 
     @ParameterizedTest
     @ValueSource(ints = {10, 20})
@@ -112,7 +116,7 @@ class PatientServiceTest {
         when(patientRepository.findById(1)).thenReturn(Optional.of(patientToBeUpdated));
         when(userRepository.findAll(any(PredicateSpecification.class))).thenReturn(List.of(patientToBeUpdated.getUser(), existingPatient.getUser()));
 
-        assertThrows(UserWithProvidedDataExists.class, () -> patientService.updatePatient(1, updatePatientRequest));
+        assertThrows(DomainValidationException.class, () -> patientService.updatePatient(1, updatePatientRequest));
         verify(patientMapper, never()).updatePatientFromRequest(any(), any());
     }
 
@@ -120,16 +124,17 @@ class PatientServiceTest {
     @DisplayName("Should not create a patient when conflicting data exists")
     void createThrowIfPatientWithPhoneNumberExists(){
         String existingPhoneNumber = "111111111";
-        Patient existingPatient = PatientBuilder.aPatient().withUser(UserBuilder.aUser().withId(2).withPhoneNumber(existingPhoneNumber).build()).build();
         CreatePatientRequest createPatientRequest = new CreatePatientRequest("Damian", "Mirek", Gender.FEMALE, LocalDate.now(), "", "", Country.FRANCE, existingPhoneNumber, LocalDate.now(), PatientSubscriptionPlan.BASIC, "", "");
+        Patient patient = PatientBuilder.aPatient().build();
 
-        when(userRepository.findAll(any(PredicateSpecification.class))).thenReturn(List.of(existingPatient.getUser()));
+        when(patientMapper.createPatientFromRequest(createPatientRequest)).thenReturn(patient);
+        doThrow(DomainValidationException.class).when(patientsDomainValidator).validate(patient);
 
-        assertThrows(UserWithProvidedDataExists.class, () -> patientService.createPatient(createPatientRequest));
+        assertThrows(DomainValidationException.class, () -> patientService.createPatient(createPatientRequest));
 
-        verify(patientMapper, never()).createPatientFromRequest(any());
         verify(userRepository, never()).save(any());
         verify(patientRepository, never()).save(any());
+
     }
 
     @Test

@@ -10,6 +10,7 @@ import com.clinicwise.backend.entity.User;
 import com.clinicwise.backend.enums.Country;
 import com.clinicwise.backend.enums.EmployeeRole;
 import com.clinicwise.backend.enums.Gender;
+import com.clinicwise.backend.exceptions.DomainValidationException;
 import com.clinicwise.backend.mapper.EmployeeMapper;
 import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.UserRepository;
@@ -92,7 +93,7 @@ class EmployeeServiceTest {
 
         when(userRepository.findAll(any(PredicateSpecification.class))).thenReturn(List.of(existingEmployee));
 
-        assertThrows(UserWithProvidedDataExists.class, () -> employeeService.createEmployee(employeeToAdd));
+        assertThrows(DomainValidationException.class, () -> employeeService.createEmployee(employeeToAdd));
         verify(employeeMapper, never()).updateEmployeeFromRequest(any(), any());
     }
 
@@ -115,7 +116,7 @@ class EmployeeServiceTest {
         when(employeeRepository.findById(1)).thenReturn(Optional.of(existingEmployeeId1));
         when(userRepository.findAll(any(PredicateSpecification.class))).thenReturn(List.of(existingEmployeeId2.getUser()));
 
-        assertThrows(UserWithProvidedDataExists.class, () -> employeeService.updateEmployee(1, employeeToUpdate));
+        assertThrows(DomainValidationException.class, () -> employeeService.updateEmployee(1, employeeToUpdate));
     }
 
     @Test
