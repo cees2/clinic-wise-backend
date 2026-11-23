@@ -9,6 +9,7 @@ import com.clinicwise.backend.dto.request.UpdateRoomRequest;
 import com.clinicwise.backend.dto.response.RoomResponse;
 import com.clinicwise.backend.dto.response.SearchSelect;
 import com.clinicwise.backend.service.RoomService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,12 +33,12 @@ public class RoomController {
     }
 
     @PostMapping
-    public ApiResponse<RoomResponse> createRoom(@RequestBody CreateRoomRequest createRoomRequest){
+    public ApiResponse<RoomResponse> createRoom(@RequestBody @Valid CreateRoomRequest createRoomRequest){
         return roomService.createRoom(createRoomRequest);
     }
 
     @PatchMapping("/{roomId}")
-    public ApiResponse<RoomResponse> updateRoom(@PathVariable int roomId, @RequestBody UpdateRoomRequest updateRoomRequest){
+    public ApiResponse<RoomResponse> updateRoom(@PathVariable int roomId, @RequestBody @Valid UpdateRoomRequest updateRoomRequest){
         return roomService.updateRoom(roomId, updateRoomRequest);
     }
 
