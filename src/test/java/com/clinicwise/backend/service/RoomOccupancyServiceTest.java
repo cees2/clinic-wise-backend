@@ -9,6 +9,7 @@ import com.clinicwise.backend.mapper.RoomOccupancyMapper;
 import com.clinicwise.backend.repository.EmployeeRepository;
 import com.clinicwise.backend.repository.RoomOccupancyRepository;
 import com.clinicwise.backend.repository.RoomRepository;
+import com.clinicwise.backend.specification.RoomOccupancyValidator;
 import com.clinicwise.backend.testdata.EmployeeBuilder;
 import com.clinicwise.backend.testdata.RoomBuilder;
 import com.clinicwise.backend.testdata.RoomOccupancyBuilder;
@@ -24,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -40,6 +42,8 @@ class RoomOccupancyServiceTest {
     private RoomOccupancyRepository roomOccupancyRepository;
     @Mock
     private RoomOccupancyMapper roomOccupancyMapper;
+    @Mock
+    private RoomOccupancyValidator roomOccupancyValidator;
     private Employee mockEmployee;
     private Room mockRoom;
     private CreateRoomOccupancyRequest mockCreateRoomOccupancyRequest;
@@ -103,5 +107,32 @@ class RoomOccupancyServiceTest {
 
         assertThrows(EntityNotFoundException.class, () -> roomOccupancyService.updateRoomOccupancy(ROOM_OCCUPANCY_ID, updateRoomOccupancyRequest));
         verify(roomOccupancyMapper, never()).updateRoomOccupancyFromRequest(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Should create a room occupancy")
+    void createRoomOccupancy() {
+        when(roomRepository.findById(mockRoom.getId())).thenReturn(Optional.of(mockRoom));
+        when(employeeRepository.findById(mockEmployee.getId())).thenReturn(Optional.of(mockEmployee));
+
+        assertDoesNotThrow(() -> roomOccupancyService.createRoomOccupancy(mockCreateRoomOccupancyRequest));
+
+        verify(roomOccupancyMapper).createRoomOccupancyFromRequest(any(), any(), any());
+        verify(roomOccupancyRepository).save(any());
+        verify(roomOccupancyValidator).validate(any());
+        verify(roomOccupancyMapper).toResponse(any());
+    }
+
+    @Test
+    @DisplayName("Should update a room occupancy")
+    void updateRoomOccupancy() {
+        when(roomRepository.findById(mockRoom.getId())).thenReturn(Optional.of(mockRoom));
+        when(employeeRepository.findById(mockEmployee.getId())).thenReturn(Optional.of(mockEmployee));
+        when(roomOccupancyRepository.findById(ROOM_OCCUPANCY_ID)).thenReturn(Optional.of(mockRoomOccupancy));
+
+        assertDoesNotThrow(() -> roomOccupancyService.updateRoomOccupancy(ROOM_OCCUPANCY_ID, updateRoomOccupancyRequest));
+        verify(roomOccupancyMapper).updateRoomOccupancyFromRequest(any(), any(), any(), any());
+        verify(roomOccupancyValidator).validate(any());
+        verify(roomOccupancyMapper).toResponse(any());
     }
 }
