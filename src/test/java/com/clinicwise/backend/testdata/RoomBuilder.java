@@ -6,7 +6,7 @@ import com.clinicwise.backend.entity.Room;
 import java.time.LocalDateTime;
 
 public class RoomBuilder {
-    private Integer id = 1;
+    private Integer id = null;
     private LocalDateTime createdAt = LocalDateTime.now().plusMinutes(30);
     private String name = "A01";
 
